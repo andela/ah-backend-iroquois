@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/andela/ah-backend-iroquois.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-iroquois)
+
 Authors Haven - A Social platform for the creative at heart.
 =======
 
