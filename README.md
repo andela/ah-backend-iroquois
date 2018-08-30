@@ -391,6 +391,42 @@ No additional parameters required
 
 `GET /api/tags`
 
+## Contribute to Authors Heaven
+
+##### Steps to install the project 
+
+1. Install PostgresQL on the machine.
+2. Set your environment Variables Below :
+    - `DATABASE_NAME`
+    - `DATABASE_USER`
+    - `DATABASE_PASSWORD`
+    - `DATABASE_HOST`
+    - `DATABASE_PORT`
+    - `DATABASE_TEST_NAME`
+    - `DATABASE_URL`
+    - `SECRET_KEY`
+    
+2.  Then `RUN` your application , but the application can be ran in different environments as below :
+
+   
+   - To run in the **production** environment `RUN`.
+   
+     `python3 manage.py runserver --settings=authors.settings.development`
+     
+   - To run in the **Testing** environment `RUN`.
+   
+      `python3 manage.py runserver --settings=authors.settings.testing`
+      
+   - To run in **Staging** environment `RUN`.
+   
+     `python3 manage.py runserver --settings=authors.settings.staging`
+     
+   -  To run in **Development** environment `RUN`.
+      
+      `python3 manage.py runserver --settings=authors.settings.development`
+    
+    
+
 
 
 
