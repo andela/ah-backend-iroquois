@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/andela/ah-backend-iroquois.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-iroquois)
+[![Build Status](https://travis-ci.org/andela/ah-backend-iroquois.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-iroquois)[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-iroquois/badge.svg)](https://coveralls.io/github/andela/ah-backend-iroquois)
 
 Authors Haven - A Social platform for the creative at heart.
 =======
