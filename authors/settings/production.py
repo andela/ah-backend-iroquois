@@ -1,9 +1,9 @@
-from authors.settings.base import *
+import os
+
 import dj_database_url
 
-# override base.py here 
-DEBUG = False
-ALLOWED_HOSTS= ['*']
-POSTGRES_URL = os.environ.get("DATABASE_URL")
-DATABASES['default'] = dj_database_url.parse(POSTGRES_URL, conn_max_age=600)
+db_env = dj_database_url.config(default=os.environ.get("DATABASE_URL", None), conn_max_age=600)
 
+DEBUG = False
+
+ALLOWED_HOSTS = ['ah-backend-staging.herokuapp.com', 'ah-backend-production.herokuapp.com']

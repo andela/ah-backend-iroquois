@@ -395,41 +395,58 @@ No additional parameters required
 
 `GET /api/tags`
 
-## Contribute to Authors Heaven
-
-##### Steps to install the project 
+##### Steps to install the project locally. 
 
 1. Install PostgresQL on the machine.
-2. Set your environment Variables Below :
-    - `DATABASE_NAME`
-    - `DATABASE_USER`
-    - `DATABASE_PASSWORD`
-    - `DATABASE_HOST`
-    - `DATABASE_PORT`
-    - `DATABASE_TEST_NAME`
-    - `DATABASE_URL`
+2. Run `pip install -r requirements.txt` to install all the project requirements.
+3. Set your environment Variables Below :
     - `SECRET_KEY`
     
-2.  Then `RUN` your application , but the application can be ran in different environments as below :
+4.  Then `RUN` your application.
+- To run it **on your local machine;**
 
-   
-   - To run in the **production** environment `RUN`.
-   
-     `python3 manage.py runserver --settings=authors.settings.development`
-     
-   - To run in the **Testing** environment `RUN`.
-   
-      `python3 manage.py runserver --settings=authors.settings.testing`
-      
-   - To run in **Staging** environment `RUN`.
-   
-     `python3 manage.py runserver --settings=authors.settings.staging`
-     
-   -  To run in **Development** environment `RUN`.
-      
-      `python3 manage.py runserver --settings=authors.settings.development`
+    `python3 manage.py runserver`   
     
-    
+    ## Deployment
+Run `pip install -r requirements.txt` to install all the project requirements.
+
+**Creating your Heroku app**
+- Log into your heroku dashboard and create a pipeline
+
+![alt txt](https://drive.google.com/uc?export=view&id=14wYvR9wslAsm-5Sc3ZMYoOGvtt3ygfh-)
+
+- Connect the pipeline apps to your Github repo
+
+![alt txt](https://drive.google.com/uc?export=view&id=1YlECJcQO8UJQXb8UzScwMGtL7s8PMs_j)
+
+- Create staging and production apps and set the staging app to auto deploy from the develop branch and the production app to auto deploy from master.
+
+![alt txt](https://drive.google.com/uc?export=view&id=18g1rPcKuFEfjRM6QFlVdavzn85adHPiS)
+
+- Add a database to the app
+
+![alt txt](https://drive.google.com/uc?export=view&id=1yYGQ5BxzDhS2f8LsQBxNwFJpPi9c4bka)
+
+Read more.... https://devcenter.heroku.com/articles/heroku-postgresql  
+
+- Setup the environment variables in the app settings.
+
+![alt txt](https://drive.google.com/uc?export=view&id=1yYGQ5BxzDhS2f8LsQBxNwFJpPi9c4bka)
+
+Follow this link for more instructions on how to deploy a django application on Heroku.
+
+https://devcenter.heroku.com/articles/django-app-configuration
+
+You may add a review app to your pipeline by enabling Review apps.
+
+More about Review apps, https://devcenter.heroku.com/articles/github-integration-review-apps
+
+After deploying the app, you can select "Open app" from the top right corner of your dashboard. Here you will get access to the link of your deployed app.
+
+## Link to our app
+
+https://ah-backend-staging.herokuapp.com/
+
 
 
 
