@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/andela/ah-backend-iroquois.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-iroquois)[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-iroquois/badge.svg)](https://coveralls.io/github/andela/ah-backend-iroquois)
+[![Build Status](https://travis-ci.org/andela/ah-backend-iroquois.svg?branch=develop)](https://travis-ci.org/andela/ah-backend-iroquois)
+[![Coverage Status](https://coveralls.io/repos/github/andela/ah-backend-iroquois/badge.svg)](https://coveralls.io/github/andela/ah-backend-iroquois)
+[![Maintainability](https://api.codeclimate.com/v1/badges/a4febbe130449a1e59a7/maintainability)](https://codeclimate.com/github/andela/ah-backend-iroquois/maintainability)
 
 Authors Haven - A Social platform for the creative at heart.
 =======
