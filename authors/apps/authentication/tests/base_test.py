@@ -11,6 +11,9 @@ class BaseTest():
         self.user_name = "iroq"
         self.user_email = "iroq@sims.andela"
         self.password = "teamiroq"
+        self.superuser_name = "iroquois"
+        self.superuser_email = "iroq@sims1.andela"
+        self.superuserpassword = "teamiroq"
         self.user_data = {"user": {"username": self.user_name, "email": self.user_email,
                                    "password": self.password,
                                    }

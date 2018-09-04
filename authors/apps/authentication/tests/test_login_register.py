@@ -48,3 +48,16 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
             format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
+
+    def test_wrong_email_on_login(self):
+        """Test an error is returned when missing an email address in login credentials."""
+        self.response = self.client.post(
+            "/api/users/login/",
+            {"user": {
+                "email": 'kake@gmail.com',
+                "password": "fakemail",
+            }
+            },
+            format="json")
+        self.assertEqual('A user with this email and password was not found.',
+                         self.response.json()['errors']['error'][0])
