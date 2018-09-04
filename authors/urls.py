@@ -24,7 +24,11 @@ from authors.settings import STATIC_ROOT, STATIC_URL
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('api/', include(('authors.apps.authentication.urls', 'authentication'), namespace='authentication')),
+    path('api/', include(('authors.apps.authentication.urls', 'authors.apps.authentication'),
+                         namespace='authentication')),
+
+    # urls for social authentication app
+    path('api/social/', include('authors.apps.social_auth.urls')),
 ]
 
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
