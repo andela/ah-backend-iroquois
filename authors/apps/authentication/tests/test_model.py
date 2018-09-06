@@ -59,3 +59,12 @@ class ModelTestCase(TestCase, BaseTest):
                 self.user_name, self.user_email, None)
         except TypeError as error:
             self.assertEqual(str(error), "Superusers must have a password.")
+
+    def test_token_creation(self):
+        """
+        Test that a token is created upon creating a user.
+        """
+
+        self.assertTrue(self.user.token)
+        self.assertTrue(self.superuser.token)
+        self.assertGreater(len(self.user.token), 10)

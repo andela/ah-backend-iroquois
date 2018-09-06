@@ -8,6 +8,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 
+
 class UserManager(BaseUserManager):
     """
     Django requires that custom users define their own Manager class. By
@@ -33,21 +34,21 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, email, password):
-      """
-      Create and return a `User` with superuser powers.
+        """
+        Create and return a `User` with superuser powers.
 
-      Superuser powers means that this use is an admin that can do anything
-      they want.
-      """
-      if password is None:
-          raise TypeError('Superusers must have a password.')
+        Superuser powers means that this use is an admin that can do anything
+        they want.
+        """
+        if password is None:
+            raise TypeError('Superusers must have a password.')
 
-      user = self.create_user(username, email, password)
-      user.is_superuser = True
-      user.is_staff = True
-      user.save()
+        user = self.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
 
-      return user
+        return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -101,13 +102,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     @property
+    def token(self):
+        """
+        Enable getting access to the token in as though 'token' is an
+        instance variable. 
+        """
+        return self.generate_token()
+
+    @property
     def get_full_name(self):
-      """
-      This method is required by Django for things like handling emails.
-      Typically, this would be the user's first and last name. Since we do
-      not store the user's real name, we return their username instead.
-      """
-      return self.username
+        """
+        This method is required by Django for things like handling emails.
+        Typically, this would be the user's first and last name. Since we do
+        not store the user's real name, we return their username instead.
+        """
+        return self.username
 
     def get_short_name(self):
         """
@@ -117,4 +126,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         return self.username
 
+    def generate_token(self):
+        """
+        This method generates a token. It uses the user's identification
+        number (Id) and the token expires within 30 days.
+        """
+        expiration_time = datetime.now() + timedelta(days=60)
 
+        token = jwt.encode({
+            'id': self.pk,
+            'exp': expiration_time
+        }, settings.SECRET_KEY, algorithm='HS256')
+
+        return token.decode('utf-8')

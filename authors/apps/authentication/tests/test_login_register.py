@@ -22,6 +22,7 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
     def test_api_can_register_a_user(self):
         """Test the api can register a user."""
         self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('token', self.response.data)
 
     def test_api_can_login_a_user(self):
         """Test the api can login a user."""
@@ -30,6 +31,7 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
             self.login_data,
             format="json")
         self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+        self.assertIn('token', self.response.data)
 
     def test_invalid_login(self):
         """Test a user can not login with invalid details."""
