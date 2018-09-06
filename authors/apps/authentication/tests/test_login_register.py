@@ -1,8 +1,13 @@
 """This module tests the login and registration of a user."""
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
 from django.test import TestCase
 
 from rest_framework.test import APIClient
 from rest_framework import status
+
+from authors.apps.authentication.models import User
 
 from authors.apps.authentication.tests.base_test import BaseTest
 
@@ -18,19 +23,23 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
             "/api/users/",
             self.user_data,
             format="json")
+        self.user = User.objects.get(email=self.user_email)
 
     def test_api_can_register_a_user(self):
         """Test the api can register a user."""
-        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('token', self.response.data)
+        self.assertEqual(status.HTTP_201_CREATED, self.response.status_code)
+        self.assertIn('message', self.response.data)
 
     def test_api_can_login_a_user(self):
         """Test the api can login a user."""
+        self.user.is_active = True
+        self.user.is_email_verified = True
+        self.user.save()
         self.response = self.client.post(
             "/api/users/login/",
             self.login_data,
             format="json")
-        self.assertEqual(self.response.status_code, status.HTTP_200_OK)
+        self.assertEqual(status.HTTP_200_OK, self.response.status_code)
         self.assertIn('token', self.response.data)
 
     def test_invalid_login(self):
@@ -91,7 +100,6 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
 
-
     def test_wrong_email(self):
         """Test if the email is wrong"""
         self.response = self.client.post(
@@ -107,7 +115,6 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
         self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual('Enter a valid email address.',
                          self.response.json()['errors']['email'][0])
-
 
     def test_password_length(self):
 
@@ -139,7 +146,6 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
             format="json"
         )
         self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
-
 
     def test_registration_successful(self):
 
@@ -173,7 +179,6 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
         self.assertEqual('This field may not be blank.',
                          self.response.json()['errors']['email'][0])
 
-
     def test_no_password_registration(self):
 
         """Test if the password length is greater than 8 characters  """
@@ -190,6 +195,3 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
         self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual('This field may not be blank.',
                          self.response.json()['errors']['password'][0])
-
-
-

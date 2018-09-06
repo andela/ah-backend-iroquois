@@ -64,7 +64,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
             error_message = 'No user matching this token was found.'
             raise exceptions.AuthenticationFailed(error_message)
 
-        if not user.is_active:
+        if user.is_email_verified and not user.is_active:
             error_message = 'This user has been deactivated.'
             raise exceptions.AuthenticationFailed(error_message)
 

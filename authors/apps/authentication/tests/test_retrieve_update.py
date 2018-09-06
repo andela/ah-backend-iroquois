@@ -32,7 +32,10 @@ class UserRetrieveUpdateAPIViewTestCase(TestCase, BaseTest):
         BaseTest.__init__(self)
         self.client = APIClient()
         self.user = User.objects.create_user(
-            self.user_name, self.user_email, self.password)
+                        self.user_name, self.user_email, self.password)
+        self.user.is_active = True
+        self.user.is_email_verified = True
+        self.user.save()
         self.login_response = self.client.post("/api/users/login/",
                                                self.login_data,
                                                format="json")
