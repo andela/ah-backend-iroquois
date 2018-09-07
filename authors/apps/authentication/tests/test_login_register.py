@@ -46,7 +46,7 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
         """Test a user can not login with invalid details."""
         self.response = self.client.post(
             "/api/users/",
-            self.user_data,
+            self.invalid_reg_data,
             format="json")
         self.assertEqual(self.response.status_code,
                          status.HTTP_400_BAD_REQUEST)
@@ -63,3 +63,133 @@ class RegistrationAPIViewTestCase(TestCase, BaseTest):
             format="json")
         self.assertEqual('A user with this email and password was not found.',
                          self.response.json()['errors']['error'][0])
+
+    def test_register_with_invalid_username(self):
+        """Test if the username is invalid """
+        self.response = self.client.post(
+                "/api/users/",
+                {"user": {
+                    "username": "&*@#$",
+                    "email": 'kakecom@gmail.com',
+                    "password": "irquoa12345678",
+                }
+                },
+                format="json"
+            )
+        self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual('Invalid Username , it contains invalid characters.',
+                         self.response.json()['errors']['error'][0])
+
+    def test_no_password_login(self):
+        """Test no password logging in."""
+        self.response = self.client.post(
+            "/api/users/",
+            self.no_password_login,
+            format="json")
+        self.assertEqual('This field may not be null.',
+                         self.response.json()['errors']['password'][0])
+        self.assertEqual(self.response.status_code,
+                         status.HTTP_400_BAD_REQUEST)
+
+
+    def test_wrong_email(self):
+        """Test if the email is wrong"""
+        self.response = self.client.post(
+                "/api/users/",
+                {"user": {
+                    "username": "Iroqua",
+                    "email": 'kakegmailcom',
+                    "password": "irquoa12345678",
+                }
+                },
+                format="json"
+            )
+        self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual('Enter a valid email address.',
+                         self.response.json()['errors']['email'][0])
+
+
+    def test_password_length(self):
+
+        """Test if the password is alphanumeric """
+        self.response = self.client.post(
+                "/api/users/",
+                {"user": {
+                    "username": "kake",
+                    "email": 'kakegmail.com',
+                    "password": "12345l",
+                }
+                },
+                format="json"
+            )
+        self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual('Ensure this field has at least 8 characters.',
+                         self.response.json()['errors']['password'][0])
+
+    def test_password_not_alphanumeric(self):
+        """Test if the password is alphanumeric """
+        self.response = self.client.post(
+            "/api/users/",
+            {"user": {
+                "username": "kake",
+                "email": 'kakegmail.com',
+                "password": "1234456789",
+            }
+            },
+            format="json"
+        )
+        self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_registration_successful(self):
+
+        """Test if the password length is greater than 8 characters  """
+        self.response = self.client.post(
+                "/api/users/",
+                {"user": {
+                    "username": "kake",
+                    "email": 'kake@gmail.com',
+                    "password": "123445abcdefghijk",
+                }
+                },
+                format="json"
+            )
+        self.assertEqual(self.response.status_code, status.HTTP_201_CREATED)
+
+    def test_no_email_registration(self):
+
+        """Test if the password length is greater than 8 characters  """
+        self.response = self.client.post(
+                "/api/users/",
+                {"user": {
+                    "username": "kake",
+                    "email": "",
+                    "password": "123445abcdefghijk",
+                }
+                },
+                format="json"
+            )
+        self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual('This field may not be blank.',
+                         self.response.json()['errors']['email'][0])
+
+
+    def test_no_password_registration(self):
+
+        """Test if the password length is greater than 8 characters  """
+        self.response = self.client.post(
+                "/api/users/",
+                {"user": {
+                    "username": "kake",
+                    "email": "huxy@gmail.com",
+                    "password": "",
+                }
+                },
+                format="json"
+            )
+        self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual('This field may not be blank.',
+                         self.response.json()['errors']['password'][0])
+
+
+

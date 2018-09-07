@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 
 from rest_framework import serializers
-
+import re
 from .models import User
 
 
@@ -15,10 +15,54 @@ class RegistrationSerializer(serializers.ModelSerializer):
         min_length=8,
         write_only=True
     )
-
     # The client should not be able to send a token along with a registration
     # request. Making `token` read-only handles that for us.
     token = serializers.CharField(max_length=255, read_only=True)
+
+    # all registration validation.
+    def make_validations(self, username, email, password):
+
+        if email is None:
+            raise serializers.ValidationError(
+                'An email address is required to register.'
+            )
+
+        if re.compile('[!@#$%^&*:;?><.0-9]').match(username):
+            raise serializers.ValidationError(
+                'Invalid Username , it contains invalid characters.'
+            )
+        if not re.match(r"([\w\.-]+)@([\w\.-]+)(\.[\w\.]+$)", email):
+            raise serializers.ValidationError(
+                'Enter a valid email address.'
+            )
+
+        if str(password).isdigit():
+            raise serializers.ValidationError(
+                'Enter an alphanumeric password, e.g one number and one letter.'
+            )
+
+        if password is None:
+            raise serializers.ValidationError(
+                'A password is required to register.'
+            )
+
+    def validate(self, data):
+        # The `validate` method is where we make sure that the current
+        # instance of `LoginSerializer` has "valid". In the case of logging a
+        # user in, this means validating that they've provided an email
+        # and password and that this combination matches one of the users in
+        username = data.get('username', None)
+        email = data.get('email', None)
+        password = data.get('password', None)
+
+        self.make_validations(username, email, password)
+
+        return {
+            'email': email,
+            'username': username,
+            'password': password,
+
+        }
 
     class Meta:
         model = User
@@ -32,18 +76,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
+
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
-
     def validate(self, data):
-        # The `validate` method is where we make sure that the current
-        # instance of `LoginSerializer` has "valid". In the case of logging a
-        # user in, this means validating that they've provided an email
-        # and password and that this combination matches one of the users in
-        # our database.
+
         email = data.get('email', None)
         password = data.get('password', None)
 
@@ -61,10 +101,6 @@ class LoginSerializer(serializers.Serializer):
                 'A password is required to log in.'
             )
 
-        # The `authenticate` method is provided by Django and handles checking
-        # for a user that matches this email/password combination. Notice how
-        # we pass `email` as the `username` value. Remember that, in our User
-        # model, we set `USERNAME_FIELD` as `email`.
         user = authenticate(username=email, password=password)
 
         # If no user was found matching this email/password combination then
@@ -119,7 +155,6 @@ class UserSerializer(serializers.ModelSerializer):
         # password field, we needed to specify the `min_length` and 
         # `max_length` properties too, but that isn't the case for the token
         # field.
-
 
     def update(self, instance, validated_data):
         """Performs an update on a User."""

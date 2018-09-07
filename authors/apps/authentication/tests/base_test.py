@@ -6,11 +6,10 @@ class BaseTest():
     """
     This class contains data required for testing by test classes.
     """
-
     def __init__(self):
         self.user_name = "iroq"
         self.user_email = "iroq@sims.andela"
-        self.password = "teamiroq"
+        self.password = "teamiroq1"
         self.superuser_name = "iroquois"
         self.superuser_email = "iroq@sims1.andela"
         self.superuserpassword = "teamiroq"
@@ -29,4 +28,10 @@ class BaseTest():
                                           "password": self.password,
                                           }
                                  }
+
+        self.no_password_login = {
+            "user": {"email": self.user_email,
+                     "password": None,
+                     }
+        }
                                  
