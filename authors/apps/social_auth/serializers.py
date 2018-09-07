@@ -8,12 +8,6 @@ from authors.apps.social_auth.common import create_user_and_return_token
 class GoogleSocialAuthViewSerializer(serializers.Serializer):
     """ Handles all social auth related tasks from google """
 
-    def create(self, validated_data):
-        pass
-
-    def update(self, instance, validated_data):
-        pass
-
     # get google authentication token from and do validations
     auth_token = serializers.CharField()
 
@@ -31,7 +25,9 @@ class GoogleSocialAuthViewSerializer(serializers.Serializer):
         user_id = user_info['sub']
 
         keys = user_info.keys()
-        email = user_info['email'] if 'email' in user_info.keys() else user_info['name']
+
+        email = "{0}_{1}".format(user_id, user_info['email']) if 'email' in keys else "{0}_google@email".format(user_id)
+
         name = "{0}_{1}".format(user_info['name'], user_id) if 'name' in keys else 'noname_{0}'.format(user_id)
 
         return create_user_and_return_token(user_id=user_id, email=email, name=name)
@@ -40,12 +36,6 @@ class GoogleSocialAuthViewSerializer(serializers.Serializer):
 # noinspection PyMethodMayBeStatic
 class FacebookSocialAuthViewSerializer(serializers.Serializer):
     """ Handles all social auth related tasks from google """
-
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
 
     # get google authentication token from and do validations
     auth_token = serializers.CharField()
@@ -67,7 +57,8 @@ class FacebookSocialAuthViewSerializer(serializers.Serializer):
         user_id = user_info['id']
         keys = user_info.keys()
 
-        email = "{0}_{1}".format(user_id, user_info['email']) if 'email' in keys else "{0}_no@email".format(user_id)
+        email = "{0}_{1}".format(user_id, user_info['email']) if 'email' in keys else "{0}_facebook@email".\
+            format(user_id)
 
         name = "{0}_{1}".format(user_info['name'], user_id) if 'name' in keys else 'noname_{0}'.format(user_id)
 
