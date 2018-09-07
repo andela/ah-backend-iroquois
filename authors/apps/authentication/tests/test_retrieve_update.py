@@ -39,6 +39,7 @@ class UserRetrieveUpdateAPIViewTestCase(TestCase, BaseTest):
         self.user_get_response = self.client.get("/api/user/")
         self.user_put_response = self.client.put("/api/user/")
 
+
     def test_non_authorized_user_blocked(self):
         """Test the api can block a non authorized"""
 
@@ -124,3 +125,24 @@ class UserRetrieveUpdateAPIViewTestCase(TestCase, BaseTest):
         self.response = self.client.get("/api/user/")
         self.assertEqual('This user has been deactivated.',
                          self.response.data['detail'])
+
+    # Test update user info
+    def test_update_user_password(self):
+        """test update user """
+
+        token = self.login_response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+
+        self.update_user = self.client.put("/api/user/",
+
+                                           data={
+                                               "user": {
+                                                   "username": self.user_name,
+                                                   "email": self.user_email,
+                                                   "password": self.password
+                                               }
+                                           }
+                                           ,
+                                           format="json")
+        self.assertEqual(self.update_user.status_code, status.HTTP_200_OK)
+

@@ -29,9 +29,16 @@ class BaseTest():
                                           }
                                  }
 
+
         self.no_password_login = {
             "user": {"email": self.user_email,
                      "password": None,
                      }
         }
                                  
+
+        self.invoke_email = {
+            "user": {
+                "email": self.user_email
+            }
+        }

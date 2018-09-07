@@ -4,6 +4,10 @@ from rest_framework import serializers
 import re
 from .models import User
 
+import os
+
+from django.shortcuts import get_object_or_404
+
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
@@ -182,3 +186,33 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+class InvokePasswordReset(serializers.Serializer):
+
+    email = serializers.CharField(max_length=255)
+
+    def validate(self, data):
+        email = data.get('email', None)
+
+        # An email is required.
+        if email is None:
+            raise serializers.ValidationError(
+                'An email address is required.'
+            )
+
+        user = get_object_or_404(User, email=email)
+
+        # get user token
+        token = user.token
+
+        if user is None:
+            raise serializers.ValidationError(
+                'A user with this email was not found.'
+            )
+
+        # call send email method here
+        # email_structure(email, token)
+
+        return {
+            'email': token
+        }

@@ -6,8 +6,10 @@ from rest_framework.views import APIView
 
 from .renderers import UserJSONRenderer
 from .serializers import (
-    LoginSerializer, RegistrationSerializer, UserSerializer
+    LoginSerializer, RegistrationSerializer, UserSerializer, InvokePasswordReset
 )
+import os
+from .utils import send_password_reset_email
 
 
 class RegistrationAPIView(APIView):
@@ -43,9 +45,7 @@ class LoginAPIView(APIView):
         # handles everything we need.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -72,4 +72,36 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class InvokePasswordResetAPIView(LoginAPIView):
+    """ 
+        This view allows the user to invoke a password reset email
+        It inherits post method of the LoginAPIView
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = InvokePasswordReset
+
+    
+    def post(self, request):
+        user = request.data.get('user', {})
+
+        # get current site
+        if 'HTTP_HOST' in request.META:
+            current_site = request.META['HTTP_HOST']
+            current_site = "https://{}".format(current_site)
+        else:
+            current_site = "http://127.0.0.1:8000"
+
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+
+        # call send email function
+        send_password_reset_email(user['email'], serializer.data['email'], current_site)
+
+        return Response({"message": "Check your email for a link"}, status=status.HTTP_200_OK)
+
+
+
+    
 

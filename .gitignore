@@ -109,3 +109,5 @@ sims1
 db.sqlite3
 .vscode/
 *cache*
+tmp
+my_env

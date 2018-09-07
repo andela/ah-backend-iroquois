@@ -230,7 +230,7 @@ Example request body:
 
 Authentication required, returns the User
 
-Accepted fields: `email`, `username`, `password`, `image`, `bio`
+Accepted fields: `email`, `username`, `password`
 
 ### Get Profile
 
@@ -253,6 +253,41 @@ No additional parameters required
 Authentication required, returns a Profile
 
 No additional parameters required
+
+## Invoke a password reset
+
+`POST /api/users/reset/password`
+
+Example request body:
+
+```source-json
+{
+  "user":{
+    "email": "jake@jake.jake"
+  }
+}
+```
+No authentication required, sends a password reset link to the email
+
+Accepted fields: `email`
+
+
+## Reset password
+
+`PATCH /api/user/reset-password/<token>`
+
+Example request body:
+
+```source-json
+{
+  "user":{
+    "password": "new_password"
+  }
+}
+```
+Authentication required, returns the User
+
+Accepted fields: `email`, `username`, `password`
 
 ### List Articles
 
