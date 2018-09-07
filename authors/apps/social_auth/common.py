@@ -1,5 +1,4 @@
 from django.contrib.auth import authenticate
-from rest_framework import serializers
 from rest_framework.permissions import AllowAny
 
 from authors.apps.authentication.models import User
@@ -17,19 +16,12 @@ def create_user_and_return_token(user_id, email, name):
             'username': name, 'email': email, 'password': 'nopassword'}
 
         # create a new facebook user
-        try:
-            User.objects.create_user(**user)
-        except:  # noqa: E722
-            msg = 'User with email {0} already exists.'.format(email)
-            raise serializers.ValidationError(
-                msg
-            )
+        User.objects.create_user(**user)
+
         User.objects.filter(email=email).update(social_id=user_id)
 
         auth = authenticate(email=email, password="nopassword")
-        return {
-            auth.token
-        }
+        return auth.token
     else:
         # if user already exists and is authenticated by google also,
         # return the user an authentication token

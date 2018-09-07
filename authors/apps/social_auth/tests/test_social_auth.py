@@ -35,7 +35,8 @@ class Tests(TestCase):
 
         self.google_debug_token = {
             "user": {
-                "auth_token": os.getenv('GOOGLE_DEBUG_TOKEN')
+                "auth_token": os.getenv('GOOGLE_DEBUG_TOKEN'),
+                "refresh_token": os.getenv('GOOGLE_DEBUG_REFRESH_TOKEN')
             }
         }
 
@@ -77,3 +78,30 @@ class Tests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()['errors']['auth_token'], [
             'The token is either invalid or expired. Please login again.'])
+
+    def test_signup_with_valid_google_token(self):
+        """ test if a user can signup with correct google token """
+
+        response = self.test_client.post(
+            "/api/social/auth/google/", data=json.dumps(
+                self.google_debug_token), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('auth_token', response.json())
+
+        # user already exists
+        response = self.test_client.post(
+            "/api/social/auth/google/", data=json.dumps(
+                self.google_debug_token), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('auth_token', response.json())
+
+    def test_signup_with_valid_facebook_token(self):
+        """ test if a user can signup with correct fb token """
+
+        response = self.test_client.post(
+            "/api/social/auth/facebook/", data=json.dumps(
+                self.facebook_debug_token), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json())
+        self.assertIn('auth_token', response.json())
+

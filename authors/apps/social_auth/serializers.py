@@ -4,17 +4,18 @@ from authors.apps.social_auth import google, facebook
 from authors.apps.social_auth.common import create_user_and_return_token
 
 
-# noinspection PyMethodMayBeStatic
+# noinspection PyMethodMayBeStatic,SpellCheckingInspection
 class GoogleSocialAuthViewSerializer(serializers.Serializer):
     """ Handles all social auth related tasks from google """
 
     # get google authentication token from and do validations
     auth_token = serializers.CharField()
+    refresh_token = serializers.CharField(write_only=True, required=False, default=None)
 
     def validate_auth_token(self, auth_token) -> object:
 
         # create an instance of the google social auth lib and validate token
-        user_info = google.GoogleAuth.validate(auth_token)
+        user_info = google.GoogleAuth.validate(auth_token, refresh_token=self.initial_data.get('refresh_token'))
 
         try:
             user_info['sub']
@@ -33,7 +34,7 @@ class GoogleSocialAuthViewSerializer(serializers.Serializer):
         return create_user_and_return_token(user_id=user_id, email=email, name=name)
 
 
-# noinspection PyMethodMayBeStatic
+# noinspection PyMethodMayBeStatic,SpellCheckingInspection
 class FacebookSocialAuthViewSerializer(serializers.Serializer):
     """ Handles all social auth related tasks from google """
 
