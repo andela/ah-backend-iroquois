@@ -30,8 +30,9 @@ class GoogleSocialAuthViewSerializer(serializers.Serializer):
             )
         user_id = user_info['sub']
 
-        name = user_info['name'] if 'name' in user_info.keys() else user_info['email']
+        keys = user_info.keys()
         email = user_info['email'] if 'email' in user_info.keys() else user_info['name']
+        name = "{0}_{1}".format(user_info['name'], user_id) if 'name' in keys else 'noname_{0}'.format(user_id)
 
         return create_user_and_return_token(user_id=user_id, email=email, name=name)
 
@@ -64,8 +65,10 @@ class FacebookSocialAuthViewSerializer(serializers.Serializer):
             )
 
         user_id = user_info['id']
+        keys = user_info.keys()
 
-        name = user_info['name'] if 'name' in user_info.keys() else user_info['email']
-        email = user_info['email'] if 'email' in user_info.keys() else user_info['name']
+        email = "{0}_{1}".format(user_id, user_info['email']) if 'email' in keys else "{0}_no@email".format(user_id)
+
+        name = "{0}_{1}".format(user_info['name'], user_id) if 'name' in keys else 'noname_{0}'.format(user_id)
 
         return create_user_and_return_token(user_id=user_id, email=email, name=name)
