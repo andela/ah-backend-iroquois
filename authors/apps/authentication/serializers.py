@@ -4,7 +4,6 @@ from rest_framework import serializers
 import re
 from .models import User
 
-import os
 
 from django.shortcuts import get_object_or_404
 

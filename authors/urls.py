@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('api/', include(('authors.apps.authentication.urls', 'authors.apps.authentication'),
                          namespace='authentication')),
+    path('api/', include('authors.apps.profiles.urls')),
 
     # urls for social authentication app
     path('api/social/', include('authors.apps.social_auth.urls')),

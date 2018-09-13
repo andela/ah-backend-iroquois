@@ -82,7 +82,7 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, pk=None, **kwargs):
         serializer_data = request.data.get('user', {})
 
         # Here is that serialize, validate, save pattern we talked about
@@ -118,7 +118,7 @@ class InvokePasswordResetAPIView(LoginAPIView):
         serializer.is_valid(raise_exception=True)
 
         # call send email function
-        send_password_reset_email(user['email'], serializer.data['email'], current_site)
+        send_password_reset_email(user['email'], serializer.data['email'], request.get_host())
 
         return Response({"message": "Check your email for a link"}, status=status.HTTP_200_OK)
 
