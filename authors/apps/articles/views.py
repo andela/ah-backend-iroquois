@@ -10,7 +10,7 @@ from rest_framework.viewsets import ViewSet
 from authors.apps.articles.exceptions import NotFoundException, InvalidQueryParameterException
 from authors.apps.articles.models import Article
 from authors.apps.articles.renderer import ArticleJSONRenderer
-from authors.apps.articles.serializers import ArticleSerializer
+from authors.apps.articles.serializers import ArticleSerializer, PaginatedArticleSerializer
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
@@ -51,12 +51,14 @@ class ArticleViewSet(ViewSet):
 
         queryset = Article.objects.all()
         if queryset.count() > 0:
-            queryset = queryset[offset:limit]
+            queryset = queryset[offset:]
 
-        serializer = self.serializer_class(queryset, many=True)
-        data = serializer.data
+        data = self.serializer_class(queryset, many=True).data
 
-        return Response(data)
+        pager_class = PaginatedArticleSerializer()
+        pager_class.page_size = limit
+
+        return Response(pager_class.get_paginated_response(pager_class.paginate_queryset(data, request)))
 
     def retrieve(self, request, slug=None):
         """

@@ -115,7 +115,7 @@ class Tests(unittest.TestCase, TestData):
         self.assertIn('article', response.json())
         self.assertIsInstance(response.json().get("article"), dict)
 
-        slug = response.json().get("article").get("slug")
+        slug = response.json().get("article").get("results").get("slug")
 
         response = self.client.get(
             "/api/articles/{0}/".format(slug), content_type='application/json')
@@ -137,7 +137,7 @@ class Tests(unittest.TestCase, TestData):
         self.assertIn('article', response.json())
         self.assertIsInstance(response.json().get("article"), dict)
 
-        slug = response.json().get("article").get("slug")
+        slug = response.json().get("article").get("results").get("slug")
 
         response = self.client.delete(
             "/api/articles/{0}/".format(slug), content_type='application/json')
@@ -166,7 +166,7 @@ class Tests(unittest.TestCase, TestData):
         response = self.client.get(
             "/api/articles/", content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json().get("articles"), list)
+        self.assertIsInstance(response.json().get("articles").get("results"), list)
         self.assertEqual(len(response.json().get("articles")), 3)
 
     def test_update_article(self):
@@ -183,7 +183,7 @@ class Tests(unittest.TestCase, TestData):
         self.assertIn('article', response.json())
         self.assertIsInstance(response.json().get("article"), dict)
 
-        slug = response.json().get("article").get("slug")
+        slug = response.json().get("article").get("results").get("slug")
 
         response = self.client.put(
             "/api/articles/{0}/".format(slug), data=json.dumps(
@@ -206,7 +206,7 @@ class Tests(unittest.TestCase, TestData):
         self.assertIn('article', response.json())
         self.assertIsInstance(response.json().get("article"), dict)
 
-        slug = response.json().get("article").get("slug")
+        slug = response.json().get("article").get("results").get("slug")
 
         response = self.client.put(
             "/api/articles/{0}/".format(slug), data=json.dumps(

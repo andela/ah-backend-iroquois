@@ -20,16 +20,16 @@ class ArticleJSONRenderer(JSONRenderer):
         :param renderer_context:
         :return:
         """
-        if isinstance(data, list) and len(data) > 1:
+        val = data.get("results", None)
+        if val and isinstance(val, list) and len(val) > 1:
             return json.dumps({
                 'articles': data
             })
 
-        if isinstance(data, list) and len(data) is 1:
-            data = data[0]
+        if val and isinstance(val, list) and len(val) is 1:
+            val = val[0]
 
-        if isinstance(data, list) and len(data) < 1:
-            data = {}
+        data.update({"results": val})
 
         errors = data.get('errors', None)
 
