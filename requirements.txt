@@ -1,3 +1,4 @@
+python-magic
 
 atomicwrites==1.2.0
 attrs==18.1.0

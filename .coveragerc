@@ -3,3 +3,4 @@ show_missing = True
 omit = 
       *authors/settings/*
       *authors/wsgi.py*
+      *test*

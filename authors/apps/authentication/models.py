@@ -1,7 +1,6 @@
-import jwt
-
 from datetime import datetime, timedelta
 
+import jwt
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -145,3 +144,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         }, settings.SECRET_KEY, algorithm='HS256')
 
         return token.decode('utf-8')
+
+    # def __getattribute__(self, attr_name):
+    #     if attr_name == 'username':
+    #         return self.username.split("_")[0]
+    #
+    #     if attr_name == "email":
+    #         data = attr_name.split("_")
+    #         if len(data) > 1:
+    #             return self.email.split("_")[1]
+    #         return self.email.split("_")[0]
+    #     else:
+    #         return super(User, self).__getattribute__(attr_name)

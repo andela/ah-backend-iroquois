@@ -30,6 +30,9 @@ urlpatterns = [
 
     # urls for social authentication app
     path('api/social/', include('authors.apps.social_auth.urls')),
+
+    # urls for articles
+    path('api/articles/', include('authors.apps.articles.urls'))
 ]
 
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
