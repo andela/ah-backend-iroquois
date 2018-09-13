@@ -16,4 +16,3 @@ class RetrieveUserProfileSerializer(serializers.ModelSerializer):
         fields = ('username', 'bio', 'first_name', 'last_name', 'location')
         read_only_fields = ('username',)
         extra_kwargs = {'token': {'read_only': True}}
-

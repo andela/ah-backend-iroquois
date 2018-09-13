@@ -38,6 +38,33 @@ The preferred JSON object to be returned by the API should be structured as foll
   }
 }
 ```
+### List of Users with their profiles
+```source-json
+{
+  "users": [
+    {
+      "email": "jake@jake.jake",
+      "username": "jake",
+      "profile": {
+        "username": "jake",
+        "bio": "I work at statefarm",
+        "image": "image-link",
+        "following": false
+      }
+  },
+  {
+    "email": "jake2@jake2.jake",
+      "username": "jake2",
+      "profile": {
+        "username": "jake2",
+        "bio": "I work at statefarm2",
+        "image": "image-link2",
+        "following": false
+      }
+  }
+  ]
+}
+```
 ### Single Article
 ```source-json
 {

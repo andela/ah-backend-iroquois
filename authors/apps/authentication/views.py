@@ -13,7 +13,7 @@ from authors.apps.authentication.utils import send_password_reset_email
 from .renderers import UserJSONRenderer
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer,
-    InvokePasswordReset)
+    InvokePasswordReset, UsersListSerializer)
 
 
 class RegistrationAPIView(APIView):
@@ -118,7 +118,8 @@ class InvokePasswordResetAPIView(LoginAPIView):
         serializer.is_valid(raise_exception=True)
 
         # call send email function
-        send_password_reset_email(user['email'], serializer.data['email'], request.get_host())
+        send_password_reset_email(
+            user['email'], serializer.data['email'], request.get_host())
 
         return Response({"message": "Check your email for a link"}, status=status.HTTP_200_OK)
 
@@ -132,7 +133,8 @@ class ActivateAccountView(APIView, JWTAuthentication):
         except (TypeError, ValueError, OverflowError, User.DoesNotExist) as e:
             return Response({"error": str(e)})
 
-        verified_user, verified_token = self.authenticate_credentials(request, token)
+        verified_user, verified_token = self.authenticate_credentials(
+            request, token)
 
         if user and (verified_user.email == user.email) and not user.is_email_verified:
             user.is_active = True
@@ -144,3 +146,21 @@ class ActivateAccountView(APIView, JWTAuthentication):
             return Response({'message': 'Email is already verified, continue to login'}, status=status.HTTP_200_OK)
 
         return Response({'error': 'Activation link invalid or expired.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UsersListAPIView(RetrieveUpdateAPIView):
+    """
+    This class is responsible for the handling users with 
+    their profiles.
+    """
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UsersListSerializer
+
+    def retrieve(self, request):
+        """
+        This method returns a list of users with their profiles.
+        """
+        queryset = User.objects.filter(is_active=True, is_email_verified=True)
+        serializer = self.serializer_class(queryset, many=True)
+
+        return Response({'users': serializer.data}, status=status.HTTP_200_OK)
