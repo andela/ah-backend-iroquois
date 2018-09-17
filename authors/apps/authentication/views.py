@@ -161,6 +161,6 @@ class UsersListAPIView(RetrieveUpdateAPIView):
         This method returns a list of users with their profiles.
         """
         queryset = User.objects.filter(is_active=True, is_email_verified=True)
-        serializer = self.serializer_class(queryset, many=True)
+        serializer = self.serializer_class(queryset, many=True, context={'request': request})
 
         return Response({'users': serializer.data}, status=status.HTTP_200_OK)

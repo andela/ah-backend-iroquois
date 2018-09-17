@@ -6,7 +6,7 @@ from .models import User
 
 from django.shortcuts import get_object_or_404
 from authors.apps.profiles.models import UserProfile
-from authors.apps.profiles.serializers import RetrieveUserProfileSerializer
+from authors.apps.profiles.serializers import UserProfileSerializer
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -233,7 +233,7 @@ class UsersListSerializer(serializers.ModelSerializer):
         """
 
         user = super().to_representation(instance)
-        profile = RetrieveUserProfileSerializer(
-            UserProfile.objects.get(user_id=instance.id)).data
+        profile = UserProfileSerializer(
+            UserProfile.objects.get(user_id=instance.id), context=self.context).data
         user['profile'] = profile
         return user

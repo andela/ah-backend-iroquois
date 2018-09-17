@@ -17,5 +17,19 @@ class UserProfile(models.Model):
     # A timestamp representing when this object was last updated.
     updated_at = models.DateTimeField(auto_now=True)
 
+    following = models.ManyToManyField('self', related_name='followers', symmetrical=False)
+
     def __str__(self):
-        return self.first_name
+        return self.user.username
+
+    def follow(self, profile):
+        """Following a user"""
+        self.following.add(profile)
+
+    def unfollow(self, profile):
+        """Unfollow a user"""
+        self.following.remove(profile)
+
+    def is_following(self, profile):
+        """To check if a user is already following the profile"""
+        return self.following.filter(pk=profile.pk).exists()

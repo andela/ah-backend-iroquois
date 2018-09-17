@@ -61,7 +61,7 @@ class TestProfile(TestCase, BaseTest):
 
         self.assertEqual(len(self.queryset), 1)
 
-        self.assertEqual(self.get_profile.__str__(), None)
+        self.assertEqual(self.get_profile.__str__(), self.user_name)
 
     def test_retrieve_profile(self):
         self.user.is_active = True
@@ -86,7 +86,11 @@ class TestProfile(TestCase, BaseTest):
                                       'first_name': None,
                                       'last_name': None,
                                       'location': None,
-                                      'username': self.user_name}}
+                                      'username': self.user_name,
+                                      'following': [],
+                                      'followers': [],
+                                      'avatar': None
+                                      }}
                          )
 
     def test_update_profile(self):
@@ -113,7 +117,10 @@ class TestProfile(TestCase, BaseTest):
                                       'first_name': self.first_name,
                                       'last_name': self.last_name,
                                       'location': self.location,
-                                      'username': self.user_name}}
+                                      'username': self.user_name,
+                                      'avatar': None,
+                                      'following': [],
+                                      'followers': []}}
                          )
 
     def test_update_with_existing_username(self):

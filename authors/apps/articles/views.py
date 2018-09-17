@@ -53,7 +53,7 @@ class ArticleViewSet(ViewSet):
         if queryset.count() > 0:
             queryset = queryset[offset:]
 
-        data = self.serializer_class(queryset, many=True).data
+        data = self.serializer_class(queryset, many=True, context={'request': request}).data
 
         pager_class = PaginatedArticleSerializer()
         pager_class.page_size = limit
@@ -69,7 +69,7 @@ class ArticleViewSet(ViewSet):
         """
         queryset = Article.objects.all()
         article = get_object_or_404(queryset, slug=slug)
-        serializer = self.serializer_class(article)
+        serializer = self.serializer_class(article, context={'request': request})
         return Response(serializer.data)
 
     def create(self, request):
@@ -81,7 +81,7 @@ class ArticleViewSet(ViewSet):
         article = request.data.get("article", {})
         article.update({"author": request.user.pk})
 
-        serializer = self.serializer_class(data=article)
+        serializer = self.serializer_class(data=article, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -99,7 +99,7 @@ class ArticleViewSet(ViewSet):
         article, article_update = self.serializer_class.validate_for_update(
             article_update, request.user, slug)
 
-        serializer = self.serializer_class(data=article_update)
+        serializer = self.serializer_class(data=article_update, context={'request': request})
         serializer.instance = article
         serializer.is_valid(raise_exception=True)
 

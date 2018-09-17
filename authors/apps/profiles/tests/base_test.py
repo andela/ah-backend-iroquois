@@ -24,8 +24,6 @@ class BaseTest():
                            }
 
         self.second_user = {"user": {"username": "second_user", "email": "second@exists.com",
-                            "password": self.password,
-                                   }
-                          }
+                            "password": self.password, }}
 
 

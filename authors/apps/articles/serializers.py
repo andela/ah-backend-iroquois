@@ -10,7 +10,7 @@ from authors.apps.articles.utils import get_date
 from authors.apps.authentication.models import User
 from authors.apps.authentication.serializers import UserSerializer
 from authors.apps.profiles.models import UserProfile
-from authors.apps.profiles.serializers import RetrieveUserProfileSerializer
+from authors.apps.profiles.serializers import UserProfileSerializer
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -67,7 +67,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         :return:
         """
         response = super().to_representation(instance)
-        profile = RetrieveUserProfileSerializer(UserProfile.objects.get(user=instance.author)).data
+        profile = UserProfileSerializer(UserProfile.objects.get(user=instance.author), context=self.context).data
 
         response['author'] = profile
         return response
