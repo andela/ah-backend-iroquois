@@ -1,8 +1,7 @@
 """
 test models
 """
-import unittest
-
+from django.test import TestCase
 from rest_framework.test import APIClient
 
 from authors.apps.articles.models import Article
@@ -10,7 +9,7 @@ from authors.apps.authentication.models import User
 
 
 # noinspection SpellCheckingInspection
-class Tests(unittest.TestCase):
+class Tests(TestCase):
 
     def setUp(self):
         """

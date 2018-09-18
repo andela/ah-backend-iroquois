@@ -5,12 +5,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
 from authors.apps.articles.exceptions import NotFoundException, InvalidQueryParameterException
 from authors.apps.articles.models import Article
 from authors.apps.articles.renderer import ArticleJSONRenderer
-from authors.apps.articles.serializers import ArticleSerializer, PaginatedArticleSerializer
+from authors.apps.articles.serializers import ArticleSerializer, PaginatedArticleSerializer, RatingSerializer
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
@@ -127,3 +128,25 @@ class ArticleViewSet(ViewSet):
             raise NotFoundException("Article is not found for update.")
 
         return Response({"detail": "Article has been deleted."}, status=status.HTTP_204_NO_CONTENT)
+
+
+class RatingsView(APIView):
+    """
+    implements methods to handle ratings requests
+    """
+    serializer_class = RatingSerializer
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (ArticleJSONRenderer,)
+
+    def post(self, request, slug=None):
+        """
+        :param slug:
+        :param request:
+        """
+        data = self.serializer_class.update_request_data(request.data.get("article", {}), slug, request.user)
+
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

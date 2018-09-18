@@ -29,7 +29,8 @@ class ArticleJSONRenderer(JSONRenderer):
         if val and isinstance(val, list) and len(val) is 1:
             val = val[0]
 
-        data.update({"results": val})
+        if val is not None:
+            data.update({"results": val})
 
         errors = data.get('errors', None)
 

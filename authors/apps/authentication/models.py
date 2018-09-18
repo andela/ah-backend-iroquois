@@ -145,14 +145,22 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return token.decode('utf-8')
 
-    # def __getattribute__(self, attr_name):
-    #     if attr_name == 'username':
-    #         return self.username.split("_")[0]
-    #
-    #     if attr_name == "email":
-    #         data = attr_name.split("_")
-    #         if len(data) > 1:
-    #             return self.email.split("_")[1]
-    #         return self.email.split("_")[0]
-    #     else:
-    #         return super(User, self).__getattribute__(attr_name)
+    @property
+    def average_rating(self):
+        """
+        calculates the average rating of the article.
+        :return:
+        """
+
+        def calc(article):
+            """
+            :param article:
+            :return:
+            """
+            rate = article.average_rating
+            return rate if rate else 0
+
+        ratings = list(map(lambda x: calc(x), self.articles.all()))
+        # if len(ratings) == 0:
+        #     return 0
+        return float('%.2f' % (sum(ratings) / len(ratings)))

@@ -43,6 +43,9 @@ def generate_slug(cls, self):
     :param self:
     :return:
     """
+    if self.id:
+        return self.slug
+
     temp_slug = slugify(self.title)
     if cls.objects.filter(slug=temp_slug).count() > 0:
         size = math.floor(len(self.description.split()) / 2)
