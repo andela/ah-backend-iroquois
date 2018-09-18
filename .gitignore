@@ -111,3 +111,6 @@ db.sqlite3
 *cache*
 tmp
 my_env
+
+#migrations
+*migrations*
