@@ -10,6 +10,14 @@ from django.utils import timezone
 from authors.apps.articles.utils import generate_slug
 from authors.apps.authentication.models import User
 
+class Tag(models.Model):
+    """
+    Tag for the article(s). Every tag has unique tag_name.
+    """
+    tag_name = models.CharField(max_length=64, unique=True)
+
+    def __str__(self):
+        return self.tag_name
 
 # noinspection SpellCheckingInspection
 class Article(models.Model):
@@ -39,6 +47,8 @@ class Article(models.Model):
 
     photo_url = models.CharField(max_length=255, null=True)
 
+    tags = models.ManyToManyField(Tag, related_name='article_tag')
+
     def __str__(self):
         """
         :return: string
@@ -52,7 +62,7 @@ class Article(models.Model):
         :param kwargs:
         """
         self.slug = generate_slug(Article, self)
-
+        
         super(Article, self).save(*args, **kwargs)
 
     @property

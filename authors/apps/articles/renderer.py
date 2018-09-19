@@ -40,3 +40,21 @@ class ArticleJSONRenderer(JSONRenderer):
         return json.dumps({
             'article': data
         })
+
+
+class TagJSONRenderer(JSONRenderer):
+    """
+    Override default renderer to customise output
+    """
+    charset = 'utf-8'
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+
+        if isinstance(data, list):
+            return json.dumps({
+                'tags': data
+            })
+
+        return json.dumps({
+            'tag': data
+        })

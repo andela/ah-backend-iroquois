@@ -7,7 +7,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from authors.apps.articles.models import Article
+from authors.apps.articles.models import Article, Tag
 from authors.apps.authentication.models import User
 from .test_data import TestData
 
@@ -165,7 +165,8 @@ class Tests(TestCase, TestData):
         response = self.client.get(
             "/api/articles/", content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertIsInstance(response.json().get("articles").get("results"), list)
+        self.assertIsInstance(response.json().get(
+            "articles").get("results"), list)
         self.assertEqual(len(response.json().get("articles")), 3)
 
     def test_update_article(self):
@@ -221,3 +222,98 @@ class Tests(TestCase, TestData):
         self.assertEqual(response.status_code, 404)
         self.assertIn('article', response.json())
         self.assertIsInstance(response.json().get("article"), dict)
+
+    def test_article_created_with_tag(self):
+        """
+        Tests the creation of an article with tags. 
+        """
+        response = self.client.post(
+            "/api/articles/",
+            self.post_article_with_tags,
+            format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual('django', response.data['tagList'][0])
+
+    def test_view_returns_tag_list(self):
+        """
+        Tests that a list of tags is returned by the TagViewSet view
+        """
+        self.user.is_superuser = True
+        self.user.save()
+        self.client.post(
+            "/api/articles/tags/tag_list/",
+            self.post_tag,
+            format="json")
+        response = self.client.get("/api/articles/tags/tag_list/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("tags", response.json())
+        self.assertEqual('django', response.json()['tags'][0]['tag_name'])
+
+    def test_view_updates_tag(self):
+        """
+        Tests an update of a tag
+        """
+        self.user.is_superuser = True
+        self.user.save()
+        self.client.post(
+            "/api/articles/tags/tag_list/",
+            self.post_tag,
+            format="json")
+        resp = self.client.get("/api/articles/tags/tag_list/")
+        tag_id = resp.json()['tags'][0]['id']
+        response = self.client.put("/api/articles/tags/tag_list/{}/".format(tag_id),
+                                   self.update_tag,
+                                   format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual("django_restful", response.json()['tag']['tag_name'])
+
+    def test_view_deletes_tag(self):
+        """
+        Test the delete of a tag
+        """
+        self.user.is_superuser = True
+        self.user.save()
+        self.client.post(
+            "/api/articles/tags/tag_list/",
+            self.post_tag,
+            format="json")
+        resp = self.client.get("/api/articles/tags/tag_list/")
+        tag_id = resp.json()['tags'][0]['id']
+        response = self.client.delete(
+            "/api/articles/tags/tag_list/{}/".format(tag_id))
+        after_delete_resp = self.client.get(
+            "/api/articles/tags/tag_list/{}/".format(tag_id))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual("Not found.", after_delete_resp.json()[
+            'tag']['detail'])
+
+    def test_no_superuser_permissions(self):
+        """
+        Tests that a TagViewSet is not accessed by an 
+        individual who is not a super user
+        """
+        response = self.client.post(
+            "/api/articles/tags/tag_list/",
+            self.post_tag,
+            format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual("You do not have permission to perform this action.",
+                         response.json()["tag"]["detail"])
+
+    def test_tag_update_on_article(self):
+        """Test that a tag is updated on an article"""
+        self.client.post(
+            "/api/articles/",
+            self.post_article_with_tags,
+            format="json")
+        resp = self.client.get("/api/articles/")
+        slug = resp.json()["article"]["results"]["slug"]
+
+        response = self.client.put(
+            "/api/articles/{}/".format(slug),
+            self.update_tag_on_article_data,
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertIn("django_restful", response.json()["article"]["tagList"])
+        self.assertNotIn("django", response.json()["article"]["tagList"])

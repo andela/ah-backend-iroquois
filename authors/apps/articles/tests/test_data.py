@@ -33,6 +33,32 @@ class TestData:
         }
     }
 
+    post_article_with_tags = {
+        "article": {
+            "title": " The last week of sems1",
+            "description": "Sims1 is ending this week and it has been intersting",
+            "body": "I had enough time to make this short.",
+            "tags": ["Django", "Python", "Java", "SpringBoot", "Hibernate", "PrimeFaces"]
+        }
+    }
+
+    post_tag = {
+        "tag_name": "Django"
+    }
+
+    update_tag = {
+        "tag_name": "django_restful"
+    }
+
+    update_tag_on_article_data = {
+        "article": {
+            "title": "The last week of sems1",
+            "description": "Sims1 is ending this week and it has been intersting",
+            "body": "I had enough time to make this short.",
+            "tags": ["Django Restful"]
+        }
+    }
+
     user_name = "iroq"
     user_email = "iroq@sims.andela"
     password = "teamiroq1"

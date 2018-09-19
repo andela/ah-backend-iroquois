@@ -49,10 +49,12 @@ def generate_slug(cls, self):
     temp_slug = slugify(self.title)
     if cls.objects.filter(slug=temp_slug).count() > 0:
         size = math.floor(len(self.description.split()) / 2)
-        temp_slug = slugify(temp_slug + " " + " ".join(self.description.split()[:size]))
+        temp_slug = slugify(
+            temp_slug + " " + " ".join(self.description.split()[:size]))
 
     if cls.objects.filter(slug=temp_slug).count() > 0:
-        temp_slug = slugify(temp_slug + " " + " ".join(get_common_words(self.body, 10)))
+        temp_slug = slugify(
+            temp_slug + " " + " ".join(get_common_words(self.body, 10)))
 
     if cls.objects.filter(slug=temp_slug).count() > 0:
         temp_slug = slugify(temp_slug + "-" + create_unique_number())

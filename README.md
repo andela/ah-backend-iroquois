@@ -166,8 +166,14 @@ The preferred JSON object to be returned by the API should be structured as foll
 ```source-json
 {
   "tags": [
-    "reactjs",
-    "angularjs"
+    {
+      "id": 1,
+      "tag_name": "reactjs"
+    },
+    {
+      "id": 2,
+      "tag_name": "angularjs"
+    }
   ]
 }
 ```
@@ -372,7 +378,7 @@ Example request body:
     "title": "How to train your dragon",
     "description": "Ever wonder how?",
     "body": "You have to believe",
-    "tagList": ["reactjs", "angularjs", "dragons"]
+    "tags": ["reactjs", "angularjs", "dragons"]
   }
 }
 ```
@@ -453,9 +459,56 @@ Authentication required, returns the Article
 
 No additional parameters required
 
+### Update a tag(s) on an article
+
+`PUT /api/articles/<slug>/`
+
+Example request body:
+
+```source-json
+{
+  "article": {
+    "title": "How to train your dragon",
+    "description": "Ever Wonder how?",
+    "body": "Keep reading...",
+    "tags": ["tag1", "tag2"]
+  }
+}
+```
+
+Authentication required, will return an Article
+
 ### Get Tags
 
-`GET /api/tags`
+`GET /api/articles/tags/tag_list/`
+
+Authentication required, returns multiple tags.
+
+### Get a Tag
+
+`GET /api/articles/tags/tag_list/<tag_id>`
+
+Authentication and super user required, returns a tag.
+
+### Delete a Tag
+
+`DELETE /api/articles/tags/tag_list/<tag_id>`
+
+Authentication and super user required.
+
+### Update a Tag
+
+`UPDATE /api/articles/tags/tag_list/<tag_id>`
+
+Example request body:
+
+```source-json
+{
+  "tag_name": "update_to_me"
+}
+```
+
+Authentication and super user required. returns a tag.
 
 ##### Steps to install the project locally. 
 

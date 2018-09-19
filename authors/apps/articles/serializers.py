@@ -5,11 +5,30 @@ from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
 from authors.apps.articles.exceptions import NotFoundException
-from authors.apps.articles.models import Article, Rating
+from authors.apps.articles.models import Article, Tag, Rating
 from authors.apps.articles.utils import get_date
 from authors.apps.authentication.models import User
 from authors.apps.profiles.models import UserProfile
 from authors.apps.profiles.serializers import UserProfileSerializer
+
+
+class TagRelatedField(serializers.RelatedField):
+    """
+    Implements a custom relational field by overriding RelatedFied.
+    returns a list of tag names.
+    """
+
+    def to_representation(self, value):
+
+        return value.tag_name
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """Handles serialization and deserialization of Tag objects."""
+
+    class Meta:
+        model = Tag
+        fields = "__all__"
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -17,16 +36,44 @@ class ArticleSerializer(serializers.ModelSerializer):
     Define action logic for an article
     """
 
-    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
-    user_rating = serializers.CharField(source='author.average_rating', required=False)
+    user_rating = serializers.CharField(
+        source='author.average_rating', required=False)
+    tagList = TagRelatedField(
+        many=True, required=False, source='tags', queryset=Tag.objects.all())
+
+    author = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), required=False)
     slug = serializers.CharField(read_only=True)
+    tags = []
 
     def create(self, validated_data):
         """
         :param validated_data:
         :return:
         """
-        return Article.objects.create(**validated_data)
+        article = Article.objects.create(**validated_data)
+
+        for tag in self.tags:
+            article.tags.add(Tag.objects.get_or_create(
+                tag_name=tag.replace(" ", "_").lower())[0])
+        return article
+
+    def update(self, instance, validated_data):
+        """
+        :param validated_data:
+        :return:
+        """
+        for key, val in validated_data.items():
+            setattr(instance, key, val)
+
+        for tag in instance.tags.all():
+            instance.tags.remove(tag)
+
+        for tag in self.tags:
+            instance.tags.add(Tag.objects.get_or_create(
+                tag_name=tag.replace(" ", "_").lower())[0])
+        instance.save()
+        return instance
 
     @staticmethod
     def validate_for_update(data: dict, user, slug):
@@ -37,7 +84,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         :return:
         """
         try:
-            article = Article.objects.filter(slug__exact=slug, author__exact=user)
+            article = Article.objects.filter(
+                slug__exact=slug, author__exact=user)
             if article.count() > 0:
                 article = article[0]
             else:
@@ -67,7 +115,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         :return:
         """
         response = super().to_representation(instance)
-        profile = UserProfileSerializer(UserProfile.objects.get(user=instance.author), context=self.context).data
+        profile = UserProfileSerializer(UserProfile.objects.get(
+            user=instance.author), context=self.context).data
 
         response['author'] = profile
         return response
@@ -79,7 +128,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         # noinspection SpellCheckingInspection
         fields = ('slug', 'title', 'description', 'body', 'created_at', 'average_rating', 'user_rating',
-                  'updated_at', 'favorited', 'favorites_count', 'photo_url', 'author')
+                  'updated_at', 'favorited', 'favorites_count', 'photo_url', 'author', 'tagList')
 
 
 class PaginatedArticleSerializer(PageNumberPagination):
@@ -110,10 +159,12 @@ class RatingSerializer(serializers.ModelSerializer):
     """
     Define action logic for an article rating
     """
-    article = serializers.PrimaryKeyRelatedField(queryset=Article.objects.all())
+    article = serializers.PrimaryKeyRelatedField(
+        queryset=Article.objects.all())
     rated_at = serializers.DateTimeField(read_only=True)
     rated_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    score = serializers.DecimalField(required=True, max_digits=4, decimal_places=2)
+    score = serializers.DecimalField(
+        required=True, max_digits=4, decimal_places=2)
 
     @staticmethod
     def update_request_data(data, slug, user: User):
@@ -153,7 +204,8 @@ class RatingSerializer(serializers.ModelSerializer):
         score = validated_data.get("score", 0)
 
         try:
-            rating = Rating.objects.get(rated_by=rated_by, article__slug=article.slug)
+            rating = Rating.objects.get(
+                rated_by=rated_by, article__slug=article.slug)
         except Rating.DoesNotExist:
             return Rating.objects.create(**validated_data)
 
