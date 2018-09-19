@@ -18,6 +18,7 @@ class UserProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     following = models.ManyToManyField('self', related_name='followers', symmetrical=False)
+    favorites = models.ManyToManyField('articles.Article', related_name='favorited_by')
 
     def __str__(self):
         return self.user.username
@@ -33,3 +34,15 @@ class UserProfile(models.Model):
     def is_following(self, profile):
         """To check if a user is already following the profile"""
         return self.following.filter(pk=profile.pk).exists()
+
+    def favorite(self, article):
+        """Favorite an article"""
+        self.favorites.add(article)
+
+    def unfavorite(self, article):
+        """Unfavorite an article"""
+        self.favorites.remove(article)
+
+    def has_favorited(self, article):
+        """Check if user has already favorited that article"""
+        return self.favorites.filter(pk=article.pk).exists()

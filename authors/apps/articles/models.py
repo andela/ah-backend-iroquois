@@ -41,8 +41,6 @@ class Article(models.Model):
 
     updated_at = models.DateTimeField(auto_created=True, auto_now=False, default=timezone.now)
 
-    favorited = models.BooleanField(default=False)
-
     favorites_count = models.IntegerField(default=0)
 
     photo_url = models.CharField(max_length=255, null=True)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from authors.apps.articles.models import Article
 from authors.apps.profiles.models import UserProfile
 
 
@@ -8,15 +9,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     following = serializers.SerializerMethodField()
     followers = serializers.SerializerMethodField()
+    favorites = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
-        fields = ('username', 'bio', 'first_name', 'last_name', 'location', 'avatar', 'following', 'followers')
+        fields = ('username', 'bio', 'first_name', 'last_name', 'location', 'avatar', 'following', 'followers',
+                  'favorites')
         read_only_fields = ('username',)
         extra_kwargs = {'token': {'read_only': True}}
 
-    def helper(self, field):
+    def helper(self, field, instance=None):
         request = self.context.get('request', None)
+        if field == 'favorites':
+            favorites = instance.favorites.through.objects.filter(userprofile__user=instance.user)
+
+            return [Article.objects.get(pk=favorite.article_id).slug for favorite in favorites]
+
         if field == 'following':
             profiles = request.user.userprofile.following.all()
         elif field == 'followers':
@@ -28,3 +36,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_followers(self, instance):
         return self.helper('followers')
+
+    def get_favorites(self, instance):
+        return self.helper('favorites', instance)

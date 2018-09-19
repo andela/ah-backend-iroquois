@@ -23,7 +23,7 @@ class BaseTest():
                                     }
                            }
 
-        self.second_user = {"user": {"username": "second_user", "email": "second@exists.com",
+        self.second_login_data = {"user": {"username": "second_user", "email": "second@exists.com",
                             "password": self.password, }}
 
 

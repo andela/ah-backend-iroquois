@@ -89,6 +89,7 @@ class TestProfile(TestCase, BaseTest):
                                       'username': self.user_name,
                                       'following': [],
                                       'followers': [],
+                                      'favorites': [],
                                       'avatar': None
                                       }}
                          )
@@ -120,13 +121,15 @@ class TestProfile(TestCase, BaseTest):
                                       'username': self.user_name,
                                       'avatar': None,
                                       'following': [],
-                                      'followers': []}}
+                                      'followers': [],
+                                      'favorites':[]
+                                      }}
                          )
 
     def test_update_with_existing_username(self):
 
         self.response = self.client.post("/api/users/",
-                                         data=self.second_user,
+                                         data=self.second_login_data,
                                          format='json')
 
         self.user.is_active = True

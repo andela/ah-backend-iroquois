@@ -4,6 +4,7 @@ Serializer classes for articles
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
+from authors.apps import articles
 from authors.apps.articles.exceptions import NotFoundException
 from authors.apps.articles.models import Article, Tag, Rating
 from authors.apps.articles.utils import get_date
@@ -44,6 +45,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     author = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), required=False)
     slug = serializers.CharField(read_only=True)
+    favorites_count = serializers.SerializerMethodField()
     tags = []
 
     def create(self, validated_data):
@@ -128,7 +130,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         # noinspection SpellCheckingInspection
         fields = ('slug', 'title', 'description', 'body', 'created_at', 'average_rating', 'user_rating',
-                  'updated_at', 'favorited', 'favorites_count', 'photo_url', 'author', 'tagList')
+                  'updated_at', 'favorites_count', 'photo_url', 'author', 'tagList')
+
+    def get_favorites_count(self, instance):
+        return instance.favorited_by.count()
 
 
 class PaginatedArticleSerializer(PageNumberPagination):

@@ -3,12 +3,12 @@ Views for articles
 """
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
+from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-
-
 from authors.apps.articles.exceptions import (
     NotFoundException, InvalidQueryParameterException)
 from authors.apps.articles.models import Article, Tag
@@ -16,8 +16,6 @@ from authors.apps.articles.renderer import ArticleJSONRenderer, TagJSONRenderer
 from authors.apps.articles.serializers import (RatingSerializer,
                            ArticleSerializer, PaginatedArticleSerializer, TagSerializer)
 from authors.apps.articles.permissions import IsSuperuser
-
-# noinspection PyUnusedLocal,PyMethodMayBeStatic
 
 
 class ArticleViewSet(ViewSet):
@@ -160,6 +158,54 @@ class RatingsView(APIView):
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FavoriteArticlesAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ArticleSerializer
+
+    def post(self, request, article_slug=None):
+        profile = self.request.user.userprofile
+        serializer_context = {'request': request}
+
+        try:
+            article = Article.objects.get(slug=article_slug)
+            if article.author == request.user:
+                return Response({'error': 'You cannot favorite your own article'}, status=status.HTTP_400_BAD_REQUEST)
+        except Article.DoesNotExist:
+            raise NotFound('An article with this slug was not found.')
+
+        if profile.has_favorited(article):
+            return Response({'message': 'You have already favorited this article'}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile.favorite(article)
+        article.favorites_count += 1
+        article.save()
+
+        serializer = self.serializer_class(article, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, article_slug=None):
+        profile = self.request.user.userprofile
+        serializer_context = {'request': request}
+
+        try:
+            article = Article.objects.get(slug=article_slug)
+        except Article.DoesNotExist:
+            raise NotFound('An article with this slug was not found.')
+
+        if not profile.has_favorited(article):
+            return Response({'message': 'This article is not in your favorites list'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        profile.unfavorite(article)
+        article.favorites_count = article.favorites_count - 1 if article.favorites_count > 0 else 0
+        article.save()
+
+        serializer = self.serializer_class(article, context=serializer_context)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
