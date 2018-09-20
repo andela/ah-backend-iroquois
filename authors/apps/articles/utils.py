@@ -60,3 +60,4 @@ def generate_slug(cls, self):
         temp_slug = slugify(temp_slug + "-" + create_unique_number())
 
     return temp_slug
+

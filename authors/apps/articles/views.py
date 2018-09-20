@@ -6,6 +6,7 @@ from rest_framework import status, viewsets
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from authors.apps.articles.exceptions import (
     NotFoundException, InvalidQueryParameterException)
@@ -14,6 +15,13 @@ from authors.apps.articles.renderer import ArticleJSONRenderer, TagJSONRenderer
 from authors.apps.articles.serializers import (RatingSerializer, ArticleReportSerializer,
                                                ArticleSerializer, PaginatedArticleSerializer, TagSerializer)
 from authors.apps.articles.permissions import IsSuperuser
+
+from .preference_utils import call_preference_helpers
+
+from .views_extra import *
+
+
+# noinspection PyUnusedLocal,PyMethodMayBeStatic
 
 
 class ArticleViewSet(ViewSet):
@@ -237,8 +245,6 @@ class TagViewSet(viewsets.ModelViewSet):
             {"message": "tag deleted successfuly"}, status=status.HTTP_204_NO_CONTENT)
 
 
-from .views_extra import *
-
 class ArticleReportView(APIView):
     """
     Handles creating, reading, updating and deleting reports
@@ -283,3 +289,21 @@ class ArticleReportView(APIView):
             return Response({"reports": serializer.data}, status=status.HTTP_200_OK)
         return Response({"detail": "permission denied, you do not have access rights."},
                         status=status.HTTP_403_FORBIDDEN)
+
+
+class LikeOrUnlikeAPIView(APIView):
+    """ Implement liking an article """
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, slug):
+        return call_preference_helpers("like", slug, request.user)
+
+
+class DislikeOrUndislikeAPIView(LikeOrUnlikeAPIView):
+    """ Implement disliking an article """
+
+    def post(self, request, slug):
+        return call_preference_helpers("dislike", slug, request.user)
+
+
