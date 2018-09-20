@@ -55,17 +55,6 @@ class Tests(TestCase, TestData):
         self.assertIn('article', response.json())
         self.assertIsInstance(response.json().get("article"), dict)
 
-    def test_article_slug(self):
-        val = 0
-        while val < 10:
-            response = self.client.post(
-                "/api/articles/", data=json.dumps(
-                    self.post_article), content_type='application/json')
-            self.assertEqual(201, response.status_code)
-            self.assertIn('article', response.json())
-            self.assertIsInstance(response.json().get("article"), dict)
-            val += 1
-
     def test_post_article_missing_data(self):
         response = self.client.post(
             "/api/articles/", data=json.dumps(

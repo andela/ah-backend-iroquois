@@ -35,7 +35,6 @@ class ArticleViewSet(ViewSet):
         :param request:
         :return:
         """
-        author = request.query_params.get("author", None)
         limit = request.query_params.get("limit", 20)
         offset = request.query_params.get("offset", 0)
 
@@ -53,7 +52,8 @@ class ArticleViewSet(ViewSet):
         except ValueError:
             raise InvalidQueryParameterException()
 
-        queryset = Article.objects.all()
+        queryset = Article.objects.search(request.query_params)
+
         if queryset.count() > 0:
             queryset = queryset[offset:]
 

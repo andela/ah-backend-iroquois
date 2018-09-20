@@ -62,3 +62,12 @@ class TestData:
     user_name = "iroq"
     user_email = "iroq@sims.andela"
     password = "teamiroq1"
+
+    post_article_tags = {
+        "article": {
+            "title": "Yet another Sand Blog",
+            "description": "Sand is m testing",
+            "body": "another that am doin test",
+            "tags": ["python", "software", "english"]
+        }
+    }

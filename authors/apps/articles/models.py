@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import Avg
 from django.utils import timezone
 
+from authors.apps.articles.filters import ArticleManager
 from authors.apps.articles.utils import generate_slug
 from authors.apps.authentication.models import User
 
@@ -24,6 +25,8 @@ class Article(models.Model):
     """
     A model for an article
     """
+    objects = ArticleManager()
+
     slug = models.SlugField(max_length=100, unique=True)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="articles", null=True)
