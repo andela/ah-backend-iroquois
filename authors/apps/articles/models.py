@@ -54,6 +54,10 @@ class Article(models.Model):
 
     tags = models.ManyToManyField(Tag, related_name='article_tag')
 
+    likes = models.ManyToManyField(User, related_name='like_preferences')
+
+    dislikes = models.ManyToManyField(User, related_name='dislike_preferences')
+
     def __str__(self):
         """
         :return: string
@@ -78,6 +82,35 @@ class Article(models.Model):
         """
         ratings = self.scores.all().aggregate(score=Avg("score"))
         return float('%.2f' % (ratings["score"] if ratings['score'] else 0))
+
+    def like(self, user):
+        return self.likes.add(user)
+
+    def dislike(self, user):
+        return self.dislikes.add(user)
+
+    def un_like(self, user):
+        return self.likes.remove(user)
+
+    def un_dislike(self, user):
+        return self.dislikes.remove(user)
+
+    def is_liking(self, user):
+        return self.likes.filter(pk=user.pk).exists()
+
+    def is_disliking(self, user):
+        return self.dislikes.filter(pk=user.pk).exists()
+
+    def is_neutral(self, user):
+        return not self.likes.filter(pk=user.pk).exists() and not self.dislikes.filter(pk=user.pk).exists()
+
+    def like_to_dislike(self, user):
+        self.un_like(user)
+        self.dislike(user)
+
+    def dislike_to_like(self, user):
+        self.un_dislike(user)
+        self.like(user)
 
     class Meta:
         get_latest_by = 'created_at'

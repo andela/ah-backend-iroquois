@@ -149,6 +149,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         response['author'] = profile
         return response
 
+    likes = serializers.SerializerMethodField()
+    dislikes = serializers.SerializerMethodField()
+
     class Meta:
         """
         class behaviours
@@ -156,10 +159,16 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
 
         fields = ('slug', 'title', 'description', 'body', 'created_at', 'average_rating', 'user_rating',
-                  'updated_at', 'favorites_count', 'photo_url', 'author', 'tagList', 'comments')
+                  'updated_at', 'favorites_count', 'photo_url', 'author', 'tagList', 'comments', 'likes', 'dislikes')
 
     def get_favorites_count(self, instance):
         return instance.favorited_by.count()
+
+    def get_likes(self, instance):
+        return instance.likes.all().count()
+
+    def get_dislikes(self, instance):
+        return instance.dislikes.all().count()
 
 
 class PaginatedArticleSerializer(PageNumberPagination):
