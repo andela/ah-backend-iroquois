@@ -306,3 +306,110 @@ class Tests(TestCase, TestData):
         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
         self.assertIn("django_restful", response.json()["article"]["tagList"])
         self.assertNotIn("django", response.json()["article"]["tagList"])
+
+    def test_reporting_an_article(self):
+        """Test that a user is able to report an article"""
+        self.client.post(
+            "/api/articles/",
+            self.post_article_with_tags,
+            format="json")
+        resp = self.client.get("/api/articles/")
+        slug = resp.json()["article"]["results"]["slug"]
+        response = self.client.post(
+            "/api/articles/reports/{}/".format(slug),
+            self.post_report,
+            format="json"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual("for real I have nothing to report.",
+                         response.json()["report_message"])
+
+    def test_reporting_on_non_existing_article(self):
+        """
+        Test that an error is raised when a user tries to 
+        report an article that does not exist.
+        """
+        response = self.client.post(
+            "/api/articles/reports/wrong_slug/",
+            self.post_report,
+            format="json"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual("An article with this slug does not exist",
+                         response.json()["detail"])
+
+    def test_report_message_validation(self):
+        """
+        Test that an error is raised when the request is 
+        missing: {"report_message": "the report message here"} or 
+        has a blank report message.
+        """
+        self.client.post(
+            "/api/articles/",
+            self.post_article_with_tags,
+            format="json")
+        resp = self.client.get("/api/articles/")
+        slug = resp.json()["article"]["results"]["slug"]
+        response = self.client.post(
+            "/api/articles/reports/{}/".format(slug),
+            " ",
+            format="json"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual("A report message is required",
+                         response.json()["detail"])
+
+    def test_all_reports_returned(self):
+        """Test that all reports on all articles are returned."""
+        self.user.is_superuser = True
+        self.user.save()
+        self.client.post(
+            "/api/articles/",
+            self.post_article_with_tags,
+            format="json")
+        resp = self.client.get("/api/articles/")
+        slug = resp.json()["article"]["results"]["slug"]
+        self.client.post(
+            "/api/articles/reports/{}/".format(slug),
+            self.post_report,
+            format="json"
+        )
+
+        response = self.client.get("/api/articles/reports/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual("for real I have nothing to report.",
+                         response.json()["reports"][0]["report_message"])
+
+    def test_reports_of_a_single_article_returned(self):
+        """Test that all reports of a single article are returned."""
+        self.user.is_superuser = True
+        self.user.save()
+        self.client.post(
+            "/api/articles/",
+            self.post_article_with_tags,
+            format="json")
+        resp = self.client.get("/api/articles/")
+        slug = resp.json()["article"]["results"]["slug"]
+        self.client.post(
+            "/api/articles/reports/{}/".format(slug),
+            self.post_report,
+            format="json"
+        )
+
+        response = self.client.get("/api/articles/reports/{}/".format(slug))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual("for real I have nothing to report.",
+                         response.json()["reports"][0]["report_message"])
+
+    def test_non_superuser_denied_report_viewing(self):
+        """
+        Test that an error is returned when a non super user tries to
+        view reports made on articles
+        """
+        response = self.client.get("/api/articles/reports/")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual("permission denied, you do not have access rights.",
+                         response.json()["detail"])

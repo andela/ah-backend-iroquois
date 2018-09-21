@@ -30,7 +30,8 @@ class Article(models.Model):
 
     slug = models.SlugField(max_length=100, unique=True)
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="articles", null=True)
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="articles", null=True)
 
     title = models.CharField(max_length=255, null=False, blank=False,
                              error_messages={"required": "Write a short title for your article."})
@@ -41,9 +42,11 @@ class Article(models.Model):
     body = models.TextField(null=False, blank=False,
                             error_messages={"required": "You cannot submit an article without body."})
 
-    created_at = models.DateTimeField(auto_created=True, auto_now=False, default=timezone.now)
+    created_at = models.DateTimeField(
+        auto_created=True, auto_now=False, default=timezone.now)
 
-    updated_at = models.DateTimeField(auto_created=True, auto_now=False, default=timezone.now)
+    updated_at = models.DateTimeField(
+        auto_created=True, auto_now=False, default=timezone.now)
 
     favorites_count = models.IntegerField(default=0)
 
@@ -85,9 +88,12 @@ class Rating(models.Model):
     """
     Model for creating article ratings or votes
     """
-    article = models.ForeignKey(Article, related_name="scores", on_delete=models.CASCADE)
-    rated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="scores", null=True)
-    rated_at = models.DateTimeField(auto_created=True, default=timezone.now, auto_now=False)
+    article = models.ForeignKey(
+        Article, related_name="scores", on_delete=models.CASCADE)
+    rated_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="scores", null=True)
+    rated_at = models.DateTimeField(
+        auto_created=True, default=timezone.now, auto_now=False)
     score = models.DecimalField(max_digits=4, decimal_places=2)
 
     class Meta:
@@ -96,13 +102,16 @@ class Rating(models.Model):
 
 class Comments(models.Model):
 
-    article = models.ForeignKey(Article, related_name='comments', on_delete=models.CASCADE, blank=True, null=True)
+    article = models.ForeignKey(
+        Article, related_name='comments', on_delete=models.CASCADE, blank=True, null=True)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    body = models.TextField(null=False, blank=False, error_messages={"required": "You cannot submit without a comment."})
+    body = models.TextField(null=False, blank=False, error_messages={
+                            "required": "You cannot submit without a comment."})
 
-    created_at = models.DateTimeField(auto_created=True, auto_now=False, default=timezone.now)
+    created_at = models.DateTimeField(
+        auto_created=True, auto_now=False, default=timezone.now)
 
     def __str__(self):
         """
@@ -117,14 +126,17 @@ class Comments(models.Model):
 
 class Replies(models.Model):
 
-    comment = models.ForeignKey(Comments, related_name='replies', on_delete=models.CASCADE, blank=True, null=True)
+    comment = models.ForeignKey(
+        Comments, related_name='replies', on_delete=models.CASCADE, blank=True, null=True)
 
-    author = models.ForeignKey(User, related_name='replies',  on_delete=models.CASCADE, blank=True , null=True)
+    author = models.ForeignKey(
+        User, related_name='replies',  on_delete=models.CASCADE, blank=True, null=True)
 
     content = models.TextField(null=False, blank=False,
-                            error_messages={"required": "You cannot submit without a reply."})
+                               error_messages={"required": "You cannot submit without a reply."})
 
-    created_at = models.DateTimeField(auto_created=True, auto_now=False, default=timezone.now)
+    created_at = models.DateTimeField(
+        auto_created=True, auto_now=False, default=timezone.now)
 
     def __str__(self):
         """
@@ -136,3 +148,14 @@ class Replies(models.Model):
         get_latest_by = 'created_at'
         ordering = ['-created_at']
 
+
+class ArticleReport(models.Model):
+    """
+    Model for creating reports made on articles
+    """
+    article = models.ForeignKey(
+        Article, blank=False, null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, blank=False, null=False, on_delete=models.CASCADE)
+    report_message = models.TextField(blank=True, null=True)
+    reported_at = models.DateTimeField(auto_now_add=True)

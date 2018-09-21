@@ -4,11 +4,14 @@ Serializer classes for articles
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 from authors.apps.articles.exceptions import NotFoundException
-from authors.apps.articles.models import Article, Tag, Rating, Comments, Replies
+
+from authors.apps.articles.models import (Article,
+                                          Tag, Rating, ArticleReport, Comments, Replies)
 from authors.apps.articles.utils import get_date
 from authors.apps.authentication.models import User
 from authors.apps.profiles.models import UserProfile
 from authors.apps.profiles.serializers import UserProfileSerializer
+from rest_framework.exceptions import NotFound
 
 
 class TagRelatedField(serializers.RelatedField):
@@ -16,6 +19,7 @@ class TagRelatedField(serializers.RelatedField):
     Implements a custom relational field by overriding RelatedFied.
     returns a list of tag names.
     """
+
     def to_representation(self, value):
 
         return value.tag_name
@@ -121,6 +125,16 @@ class ArticleSerializer(serializers.ModelSerializer):
             "updated_at": get_date()
         })
         return article, data
+
+    @staticmethod
+    def get_article_object(slug):
+        """This method returns an instance of Article"""
+        article = None
+        try:
+            article = Article.objects.get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound("An article with this slug does not exist")
+        return article
 
     def to_representation(self, instance):
         """
@@ -249,3 +263,21 @@ class RatingSerializer(serializers.ModelSerializer):
         model = Rating
         fields = ("score", "rated_by", "rated_at", "article")
 
+
+class ArticleReportSerializer(serializers.ModelSerializer):
+    """
+    Handles serialization and deserialization of ArticleReportSerializer objects.
+    """
+
+    def create(self, validated_data):
+        return ArticleReport.objects.create(**validated_data)
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response["user"] = instance.user.username
+        response["article"] = instance.article.slug
+        return response
+
+    class Meta:
+        model = ArticleReport
+        fields = ['user', 'article', 'report_message']

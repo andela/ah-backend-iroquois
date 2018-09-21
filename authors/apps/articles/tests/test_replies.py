@@ -134,7 +134,6 @@ class Tests(TestCase, TestDataReplies):
                 self.post_comment), content_type='application/json')
         self.assertEqual(201, response.status_code)
         self.assertIsInstance(response.json(), dict)
-        print('response --- > ', response)
 
         id = response.json().get('id')
         response = self.client.post(
@@ -173,7 +172,6 @@ class Tests(TestCase, TestDataReplies):
                 self.post_comment), content_type='application/json')
         self.assertEqual(201, response.status_code)
         self.assertIsInstance(response.json(), dict)
-        print('response --- > ', response)
 
         id = response.json().get('id')
 
@@ -221,8 +219,6 @@ class Tests(TestCase, TestDataReplies):
                 self.post_comment), content_type='application/json')
         self.assertEqual(201, response.status_code)
         self.assertIsInstance(response.json(), dict)
-        print('response --- > ', response)
-
         id = response.json().get('id')
         response = self.client.post(
             "/api/articles/comment/{}/replies/".format(id), data=json.dumps(

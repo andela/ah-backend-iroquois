@@ -36,7 +36,6 @@ class CommentsView(APIView):
             serializer = CommentSerializer(data=content_data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            print('serializer data', serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Article.DoesNotExist:
             return Response({"message": "Sorry, this article is not found."}, status=status.HTTP_404_NOT_FOUND)

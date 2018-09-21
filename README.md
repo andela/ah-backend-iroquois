@@ -177,6 +177,18 @@ The preferred JSON object to be returned by the API should be structured as foll
   ]
 }
 ```
+
+### List of reports
+
+```source-json
+{
+  "reports": [
+    "user": "jake",
+    "article": "how-to-train-your-dragon",
+    "report_message": "let me report this issue"
+  ]
+}
+```
 ### Errors and Status Codes
 If a request fails any validations, expect errors in the following format:
 
@@ -509,6 +521,33 @@ Example request body:
 ```
 
 Authentication and super user required. returns a tag.
+
+### Report Article
+
+`POST /api/articles/reports/<slug>/`
+
+Example request body:
+
+```source-json
+{
+  "report_message": "let me report this issue"
+}
+```
+Required fields: `report_message`.
+
+Authentication required, returns a report.
+
+### Get all Reports of all Articles
+
+`GET /api/articles/reports/`
+
+Authentication and super user required, returns multiple reports.
+
+### Get all Reports on a single Article
+
+`GET /api/articles/reports/<slug>/`
+
+Authentication and super user required, returns multiple reports.
 
 ##### Steps to install the project locally. 
 

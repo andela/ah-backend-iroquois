@@ -59,6 +59,10 @@ class TestData:
         }
     }
 
+    post_report = {
+        "report_message": "for real I have nothing to report."
+    }
+
     user_name = "iroq"
     user_email = "iroq@sims.andela"
     password = "teamiroq1"

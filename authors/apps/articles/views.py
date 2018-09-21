@@ -7,11 +7,12 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from authors.apps.articles.exceptions import ( InvalidQueryParameterException)
-from authors.apps.articles.models import Article, Tag
+from authors.apps.articles.exceptions import (
+    NotFoundException, InvalidQueryParameterException)
+from authors.apps.articles.models import Article, Tag, ArticleReport
 from authors.apps.articles.renderer import ArticleJSONRenderer, TagJSONRenderer
-from authors.apps.articles.serializers import (RatingSerializer,
-                           ArticleSerializer, PaginatedArticleSerializer, TagSerializer)
+from authors.apps.articles.serializers import (RatingSerializer, ArticleReportSerializer,
+                                               ArticleSerializer, PaginatedArticleSerializer, TagSerializer)
 from authors.apps.articles.permissions import IsSuperuser
 
 
@@ -238,3 +239,47 @@ class TagViewSet(viewsets.ModelViewSet):
 
 from .views_extra import *
 
+class ArticleReportView(APIView):
+    """
+    Handles creating, reading, updating and deleting reports
+    made on an article
+    """
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ArticleReportSerializer
+
+    def post(self, request, slug):
+        """This method handles post requests when reporting an article."""
+        message = None
+        if "report_message" in request.data and request.data["report_message"].strip():
+            article = ArticleSerializer.get_article_object(slug)
+            user = request.user.id
+            message = request.data["report_message"]
+            data = {"user": user, "article": article.id,
+                    "report_message": message}
+            serializer = self.serializer_class(data=data)
+
+            serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response({"detail": "A report message is required"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, slug=None):
+        """This method returns reports made on an article."""
+        article_reports = None
+        serializer = None
+        if request.user.is_superuser:
+            if slug:
+
+                article = ArticleSerializer.get_article_object(slug)
+                article_reports = ArticleReport.objects.filter(
+                    article=article.id)
+                serializer = self.serializer_class(article_reports, many=True)
+                return Response({"reports": serializer.data}, status=status.HTTP_200_OK)
+
+            article_reports = ArticleReport.objects.all()
+            serializer = self.serializer_class(article_reports, many=True)
+            return Response({"reports": serializer.data}, status=status.HTTP_200_OK)
+        return Response({"detail": "permission denied, you do not have access rights."},
+                        status=status.HTTP_403_FORBIDDEN)
