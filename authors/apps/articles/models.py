@@ -63,7 +63,7 @@ class Article(models.Model):
         :param kwargs:
         """
         self.slug = generate_slug(Article, self)
-        
+
         super(Article, self).save(*args, **kwargs)
 
     @property
@@ -91,3 +91,47 @@ class Rating(models.Model):
 
     class Meta:
         ordering = ('-score',)
+
+
+class Comments(models.Model):
+
+    article = models.ForeignKey(Article, related_name='comments', on_delete=models.CASCADE, blank=True, null=True)
+
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    body = models.TextField(null=False, blank=False, error_messages={"required": "You cannot submit without a comment."})
+
+    created_at = models.DateTimeField(auto_created=True, auto_now=False, default=timezone.now)
+
+    def __str__(self):
+        """
+        :return: string
+        """
+        return self.body
+
+    class Meta:
+        get_latest_by = 'created_at'
+        ordering = ['-created_at']
+
+
+class Replies(models.Model):
+
+    comment = models.ForeignKey(Comments, related_name='replies', on_delete=models.CASCADE, blank=True, null=True)
+
+    author = models.ForeignKey(User, related_name='replies',  on_delete=models.CASCADE, blank=True , null=True)
+
+    content = models.TextField(null=False, blank=False,
+                            error_messages={"required": "You cannot submit without a reply."})
+
+    created_at = models.DateTimeField(auto_created=True, auto_now=False, default=timezone.now)
+
+    def __str__(self):
+        """
+        :return: string
+        """
+        return self.content
+
+    class Meta:
+        get_latest_by = 'created_at'
+        ordering = ['-created_at']
+

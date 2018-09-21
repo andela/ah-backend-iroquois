@@ -3,13 +3,22 @@ Defines urls used in article package
 """
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-
 from authors.apps.articles.views import ArticleViewSet, FavoriteArticlesAPIView, TagViewSet, RatingsView
+from authors.apps.articles.views import CommentsView,RepliesView
+from authors.apps.articles.views import ArticleViewSet, TagViewSet, RatingsView
+
 
 urlpatterns = [
+
     path('<article_slug>/favorite/', FavoriteArticlesAPIView.as_view(), name="favorite"),
     path('<article_slug>/unfavorite/', FavoriteArticlesAPIView.as_view(), name="unfavorite"),
     path("<slug>/rate/", RatingsView.as_view()),
+    path('<slug>/comment/', CommentsView.as_view()),
+    path('comment/<Id>/', CommentsView.as_view()),
+    path('comment/', CommentsView.as_view()),
+    path('comment/<commentID>/replies/', RepliesView.as_view()),
+    path('comment/replies/<Id>/', RepliesView.as_view()),
+
 ]
 
 router = DefaultRouter()

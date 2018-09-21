@@ -3,10 +3,8 @@ Serializer classes for articles
 """
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-
-from authors.apps import articles
 from authors.apps.articles.exceptions import NotFoundException
-from authors.apps.articles.models import Article, Tag, Rating
+from authors.apps.articles.models import Article, Tag, Rating, Comments, Replies
 from authors.apps.articles.utils import get_date
 from authors.apps.authentication.models import User
 from authors.apps.profiles.models import UserProfile
@@ -18,7 +16,6 @@ class TagRelatedField(serializers.RelatedField):
     Implements a custom relational field by overriding RelatedFied.
     returns a list of tag names.
     """
-
     def to_representation(self, value):
 
         return value.tag_name
@@ -32,6 +29,22 @@ class TagSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class RepliesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Replies
+        fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    replies = RepliesSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Comments
+        fields = ('id', 'body', 'article', 'author', 'replies')
+
+
 class ArticleSerializer(serializers.ModelSerializer):
     """
     Define action logic for an article
@@ -41,12 +54,12 @@ class ArticleSerializer(serializers.ModelSerializer):
         source='author.average_rating', required=False)
     tagList = TagRelatedField(
         many=True, required=False, source='tags', queryset=Tag.objects.all())
-
     author = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), required=False)
     slug = serializers.CharField(read_only=True)
     favorites_count = serializers.SerializerMethodField()
     tags = []
+    comments = CommentSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         """
@@ -128,9 +141,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         class behaviours
         """
         model = Article
-        # noinspection SpellCheckingInspection
+
         fields = ('slug', 'title', 'description', 'body', 'created_at', 'average_rating', 'user_rating',
-                  'updated_at', 'favorites_count', 'photo_url', 'author', 'tagList')
+                  'updated_at',  'favorited', 'favorites_count', 'photo_url', 'author', 'tagList', 'comments')
 
     def get_favorites_count(self, instance):
         return instance.favorited_by.count()
@@ -236,3 +249,4 @@ class RatingSerializer(serializers.ModelSerializer):
         """
         model = Rating
         fields = ("score", "rated_by", "rated_at", "article")
+

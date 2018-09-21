@@ -3,14 +3,11 @@ Views for articles
 """
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
-from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from authors.apps.articles.exceptions import (
-    NotFoundException, InvalidQueryParameterException)
+from authors.apps.articles.exceptions import ( InvalidQueryParameterException)
 from authors.apps.articles.models import Article, Tag
 from authors.apps.articles.renderer import ArticleJSONRenderer, TagJSONRenderer
 from authors.apps.articles.serializers import (RatingSerializer,
@@ -135,7 +132,6 @@ class ArticleViewSet(ViewSet):
             article.delete()
         except Article.DoesNotExist:
             raise NotFoundException("Article is not found for update.")
-
         return Response({"detail": "Article has been deleted."}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -238,3 +234,7 @@ class TagViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(
             {"message": "tag deleted successfuly"}, status=status.HTTP_204_NO_CONTENT)
+
+
+from .views_extra import *
+
