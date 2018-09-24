@@ -49,7 +49,6 @@ class ArticleSerializer(serializers.ModelSerializer):
     """
     Define action logic for an article
     """
-
     user_rating = serializers.CharField(
         source='author.average_rating', required=False)
     tagList = TagRelatedField(
@@ -143,7 +142,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
 
         fields = ('slug', 'title', 'description', 'body', 'created_at', 'average_rating', 'user_rating',
-                  'updated_at',  'favorited', 'favorites_count', 'photo_url', 'author', 'tagList', 'comments')
+                  'updated_at', 'favorites_count', 'photo_url', 'author', 'tagList', 'comments')
 
     def get_favorites_count(self, instance):
         return instance.favorited_by.count()

@@ -11,6 +11,7 @@ from authors.apps.articles.filters import ArticleManager
 from authors.apps.articles.utils import generate_slug
 from authors.apps.authentication.models import User
 
+
 class Tag(models.Model):
     """
     Tag for the article(s). Every tag has unique tag_name.
@@ -20,7 +21,7 @@ class Tag(models.Model):
     def __str__(self):
         return self.tag_name
 
-# noinspection SpellCheckingInspection
+
 class Article(models.Model):
     """
     A model for an article
