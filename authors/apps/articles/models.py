@@ -187,7 +187,7 @@ class ArticleReport(models.Model):
     Model for creating reports made on articles
     """
     article = models.ForeignKey(
-        Article, blank=False, null=False, on_delete=models.CASCADE)
+        Article, blank=False, null=False, on_delete=models.CASCADE, default=0)
     user = models.ForeignKey(
         User, blank=False, null=False, on_delete=models.CASCADE)
     report_message = models.TextField(blank=True, null=True)

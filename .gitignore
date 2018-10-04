@@ -112,4 +112,4 @@ db.sqlite3
 tmp
 my_env
 
-#migrations
+migrations
