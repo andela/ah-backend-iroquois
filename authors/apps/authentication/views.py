@@ -107,19 +107,16 @@ class InvokePasswordResetAPIView(LoginAPIView):
     def post(self, request):
         user = request.data.get('user', {})
 
-        # get current site
-        if 'HTTP_HOST' in request.META:
-            current_site = request.META['HTTP_HOST']
-            current_site = "https://{}".format(current_site)
-        else:
-            current_site = "http://127.0.0.1:8000"
+        # check that callback url is passed
+        if 'call_back' not in user:
+            return Response({"error": "Please provide a callback URL"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
 
         # call send email function
         send_password_reset_email(
-            user['email'], serializer.data['email'], request.get_host())
+            user['email'], serializer.data['email'], user['call_back'])
 
         return Response({"message": "Check your email for a link"}, status=status.HTTP_200_OK)
 

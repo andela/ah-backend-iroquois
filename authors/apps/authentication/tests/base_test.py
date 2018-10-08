@@ -35,10 +35,10 @@ class BaseTest():
                      "password": None,
                      }
         }
-                                 
 
         self.invoke_email = {
             "user": {
-                "email": self.user_email
+                "email": self.user_email,
+                "call_back": ""
             }
         }

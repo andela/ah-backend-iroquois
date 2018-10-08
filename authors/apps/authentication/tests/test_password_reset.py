@@ -27,14 +27,23 @@ class PasswordResetTestCase(TestCase, BaseTest):
         # This email is not associated with a user
         self.email_404 = {
             "user": {
-                "email": "email_404@none.com"
+                "email": "email_404@none.com",
+                "call_back": ""
             }
         }
 
         # Here we don't pass in an email
         self.empty_email = {
             "user": {
-                "email": ""
+                "email": "",
+                "call_back": ""
+            }
+        }
+
+        # Invoke password reset email with no call_back url
+        self.no_callback = {
+            "user": {
+                "email": "example@gmail.com",
             }
         }
 
@@ -71,3 +80,15 @@ class PasswordResetTestCase(TestCase, BaseTest):
         self.assertEqual(self.response.json()['errors'],
                          {'email': ['This field may not be blank.']})
 
+    def test_with_no_call_back_url(self):
+        """ Test user can not invoke password reset for email that does not exist"""
+
+        self.response = self.client.post(
+            "/api/users/reset/password",
+            self.no_callback,
+            format="json"
+
+        )
+
+        self.assertEqual(self.response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(self.response.json(), {'user': {'error': 'Please provide a callback URL'}})
