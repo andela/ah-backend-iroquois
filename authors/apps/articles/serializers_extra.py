@@ -169,6 +169,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         response['author'] = profile
         return response
 
+    likes_count = serializers.SerializerMethodField()
+    dislikes_count = serializers.SerializerMethodField()
+
     likes = serializers.SerializerMethodField()
     dislikes = serializers.SerializerMethodField()
 
@@ -179,13 +182,22 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
 
         fields = ('slug', 'title', 'description', 'body', 'created_at', 'average_rating', 'user_rating',
-                  'updated_at', 'favorites_count', 'photo_url', 'author', 'tagList', 'comments', 'likes', 'dislikes')
+                  'updated_at', 'favorites_count', 'photo_url', 'author', 'tagList', 'comments', 'likes',
+                  'dislikes', 'likes_count', 'dislikes_count')
 
     def get_favorites_count(self, instance):
         return instance.favorited_by.count()
 
-    def get_likes(self, instance):
+    def get_likes_count(self, instance):
         return instance.likes.all().count()
 
-    def get_dislikes(self, instance):
+    def get_dislikes_count(self, instance):
         return instance.dislikes.all().count()
+
+    def get_likes(self, instance):
+        users = instance.likes.all()
+        return [user.username for user in users]
+
+    def get_dislikes(self, instance):
+        users = instance.dislikes.all()
+        return [user.username for user in users]

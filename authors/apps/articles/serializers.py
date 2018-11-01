@@ -1,11 +1,8 @@
 """
 Serializer classes for articles
 """
-from rest_framework import serializers
+
 from rest_framework.pagination import PageNumberPagination
-from authors.apps.articles.exceptions import NotFoundException
-from authors.apps.articles.models import (Article,
-                                        Tag, Rating, ArticleReport, Comments, Replies)
 from .serializers_extra import *
 
 
