@@ -26,16 +26,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return [Article.objects.get(pk=favorite.article_id).slug for favorite in favorites]
 
         if field == 'following':
-            profiles = request.user.userprofile.following.all()
+            profiles = instance.following.all()
         elif field == 'followers':
-            profiles = request.user.userprofile.followers.all()
+            profiles = instance.followers.all()
         return [profile.user.username for profile in profiles]
 
     def get_following(self, instance):
-        return self.helper('following')
+        return self.helper('following', instance)
 
     def get_followers(self, instance):
-        return self.helper('followers')
+        return self.helper('followers', instance)
 
     def get_favorites(self, instance):
         return self.helper('favorites', instance)

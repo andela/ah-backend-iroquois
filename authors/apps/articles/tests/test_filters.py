@@ -93,7 +93,7 @@ class Tests(TestCase, TestData):
             "/api/articles/?title={0}&author=iroq".format(quote('Yet another Sand Blogs')),
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
-        self.assertIn('article', response.json())
+        self.assertIn('articles', response.json())
 
         response = self.client.get(
             "/api/articles/?author=iroq".format(quote('Yet another Sand Blogs')),
